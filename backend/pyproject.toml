@@ -1,0 +1,14 @@
+[project]
+name = "itc2026-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dishka>=1.9.1",
+    "fastapi>=0.135.1",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
+    "pyjwt[crypto]>=2.12.1",
+    "uvicorn[standard]>=0.42.0",
+]
