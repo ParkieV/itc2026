@@ -1,9 +1,11 @@
+from pathlib import Path
+
 import jwt
 
 class JWTProvider:
-    def __init__(self, private_key: str, public_key: str, algorithm: str = "RS256"):
-        self.private_key = private_key
-        self.public_key = public_key
+    def __init__(self, private_key_path: str, public_key_path: str, algorithm: str):
+        self.private_key = Path(private_key_path).absolute().read_text()
+        self.public_key = Path(public_key_path).absolute().read_text()
         self.algorithm = algorithm
 
     def encode(self, **claims) -> str:
