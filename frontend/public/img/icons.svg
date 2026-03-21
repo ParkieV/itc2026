@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <symbol id="arrowLeft" viewBox="0 0 45 45" fill="none">
+        <path fill="#B6B6B6" d="M20.075 33.362a1.875 1.875 0 1 1-2.652 2.651L6.56 25.152a3.75 3.75 0 0 1 0-5.303L17.423 8.987a1.875 1.875 0 0 1 2.652 2.651l-8.987 8.987h26.41a1.875 1.875 0 1 1 0 3.75h-26.41l8.987 8.987Z"/>
+    </symbol>
+    <symbol id="arrowRight" viewBox="0 0 24 24" fill="none">
+        <path fill="#fff" d="M13.293 18.355a1 1 0 0 0 1.414 1.415l5.793-5.793a2 2 0 0 0 0-2.829l-5.793-5.793a1 1 0 1 0-1.414 1.415l4.793 4.793H4a1 1 0 1 0 0 2h14.086l-4.793 4.792Z"/>
+    </symbol>
+</svg>

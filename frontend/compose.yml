@@ -1,0 +1,32 @@
+name: emk-frontend
+
+services:
+  frontend:
+    container_name: frontend
+    image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA?error}
+    restart: unless-stopped
+    networks:
+      - emk-shared-net
+    logging:
+      driver: journald
+      options:
+        mode: non-blocking
+        max-buffer-size: 64m
+        tag: emk-frontend
+
+  caddy:
+    container_name: caddy
+    image: caddy:alpine
+    restart: unless-stopped
+    networks:
+      - hared-net
+    logging:
+      driver: journald
+      options:
+        mode: non-blocking
+        max-buffer-size: 64m
+        tag: emk-caddy
+
+networks:
+  emk-shared-net:
+    external: true
