@@ -1,4 +1,4 @@
-from dishka import Container, Provider, provide, Scope
+from dishka import Container, Provider, provide, Scope, make_async_container
 
 from security.jwt_provider import JWTProvider
 from repositories.client_inmemory_repo import AsyncInMemoryClientRepository
@@ -33,4 +33,4 @@ class AsyncAppProvider(Provider):
         return IssueTokenUseCase(client_repo, token_service)
 
 
-container = Container(AsyncAppProvider())
+container = make_async_container(AsyncAppProvider())

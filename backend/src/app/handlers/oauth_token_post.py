@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Form, HTTPException
-from dishka.integrations.fastapi import FromDishka
+from dishka.integrations.fastapi import FromDishka, inject
 
 from usecases.issue_token import IssueTokenUseCase
 
@@ -7,12 +7,13 @@ router = APIRouter()
 
 
 @router.post("/oauth/token")
+@inject
 async def token(
+    use_case: FromDishka[IssueTokenUseCase],
     grant_type: str = Form(...),
     client_id: str = Form(...),
     client_secret: str = Form(...),
-    scope: str = Form(""),
-    use_case: IssueTokenUseCase = FromDishka(),
+    scope: str = Form("")
 ):
     if grant_type != "client_credentials":
         raise HTTPException(status_code=400, detail="unsupported_grant_type")
