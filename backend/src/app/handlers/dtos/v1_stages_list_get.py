@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import field
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 
 
 class StageGetResponse(BaseModel):
@@ -27,3 +29,13 @@ class V1StageWithReviewerAndDocsGetResponse(BaseModel):
     stage: StageSummaryGetResponse
     docs: list[Any] = Field(default_factory=list)
     reviewers: list[StageReviewerUserGetResponse] = Field(default_factory=list)
+
+
+class V1_STAGES_LIST_GET_RESPONSE200(RootModel[list[V1StageWithReviewerAndDocsGetResponse]]):
+    """Список этапов с документами и ревьюерами."""
+
+
+class V1_STAGES_LIST_GET_RESPONSE401(BaseModel):
+    """Невалидный JWT или в токене нет subject (sub)."""
+
+    detail: str = Field(description="Текст ошибки")
