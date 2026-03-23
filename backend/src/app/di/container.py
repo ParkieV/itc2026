@@ -5,8 +5,11 @@ from dishka import Provider, provide, Scope, make_async_container
 
 from config import AppConfig, JWTSettings, HTTPServerSettings
 from security.jwt_provider import JWTProvider
+from repositories.inmemory_document_repo import InMemoryDocumentRepository
 from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
 from services.authenticate_user.service import AuthenticateUserService
+from services.get_origin_document.service import GetOriginDocumentService
+from services.get_pdf_document.service import GetPdfDocumentService
 from services.get_user.service import GetUserService
 from services.issue_access_token import IssueAccessTokenService
 from usecases.authorize_user.usecase import AuthorizeUserUseCase
@@ -31,6 +34,10 @@ class AsyncAppProvider(Provider):
         return repo
 
     @provide
+    async def document_repo(self) -> InMemoryDocumentRepository:
+        return InMemoryDocumentRepository()
+
+    @provide
     async def authenticate_user_service(self, user_repo: AsyncInMemoryUserRepository) -> AuthenticateUserService:
         return AuthenticateUserService(user_repo)
 
@@ -52,6 +59,20 @@ class AsyncAppProvider(Provider):
         user_repo: AsyncInMemoryUserRepository,
     ) -> GetUserService:
         return GetUserService(user_repo)
+
+    @provide
+    async def get_pdf_document_service(
+        self,
+        document_repo: InMemoryDocumentRepository,
+    ) -> GetPdfDocumentService:
+        return GetPdfDocumentService(document_repo)
+
+    @provide
+    async def get_origin_document_service(
+            self,
+            document_repo: InMemoryDocumentRepository,
+    ) -> GetOriginDocumentService:
+        return GetOriginDocumentService(document_repo)
 
 
 class ConfigProvider(Provider):

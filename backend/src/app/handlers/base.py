@@ -2,8 +2,12 @@ from fastapi import APIRouter
 
 from .v1_auth_authenticate_post import router as v1_auth_authenticate_post_router
 from .v1_cabinet_client_get import router as v1_cabinet_client_get_router
+from .v1_cabinet_document_file_get import router as v1_cabinet_document_file_get_router
+from .v1_cabinet_document_pdf_file_get import router as v1_cabinet_document_pdf_file_get_router
 
 router = APIRouter()
 
 router.include_router(v1_auth_authenticate_post_router)
 router.include_router(v1_cabinet_client_get_router)
+router.include_router(v1_cabinet_document_file_get_router)
+router.include_router(v1_cabinet_document_pdf_file_get_router)
