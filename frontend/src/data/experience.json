@@ -1,0 +1,97 @@
+{
+    "hackathons": {
+        "title": {
+            "en":"Hackathons",
+            "ru":"Хакатоны"
+        },
+        "descr" : "Lorema Lorema lorema",
+        "data": [
+            {
+                "name": "Tatar.Бу",
+                "url": "https://www.hackerrank.com/",
+                "case": "Платформа для изучения татарского языка",
+                "place" : 1,
+                "time": "May 2024",
+                "teamName": "MISIS 52",
+                "caseDescr": "",
+                "solveDescr": "",
+                "repository": "https://github.com/NikitaKrylov/TatarbuBot",
+                "stack": ["React", "JS", "SCSS", "TelegramApi"]
+            },
+            {
+                "name": "Selectel",
+                "url": "https://www.hackerrank.com/",
+                "case": "Помощь домашним животным",
+                "place" : 4,
+                "time": "Febrary 2024",
+                "teamName": "MISIS 52",
+                "caseDescr": "",
+                "solveDescr": "",
+                "repository": "https://github.com/NikitaKrylov/DonorSearchSelectel",
+                "stack": ["React", "JS", "SCSS"]
+            },
+            {
+                "name": "Smolathon",
+                "url": "https://www.hackerrank.com/",
+                "case": "Сохранение национального наследия",
+                "place" : 1,
+                "time": "November 2023",
+                "teamName": "MISIS 52",
+                "caseDescr": "",
+                "solveDescr": "",
+                "repository": "https://github.com/NikitaKrylov/SmolathonHack",
+                "stack": ["Docker", "Docker Compose", "JS"]
+            }
+        ]
+    },
+    "workplaces" : {
+        "title": {
+            "en":"Workplaces",
+            "ru":"Места работы"
+        },
+        "descr" : "Lorema Lorema lorema",
+        "data": [
+            {
+                "name": "MISIS",
+                "logo": "Doggers.png",
+                "url": "https://www.yandex.ru/",
+                "position": "Frontend Developer",
+                "time": "2024 May - August",
+                "stack" : ["Svelte", "SvelteKit","TS", "SCSS"]
+            },
+            {
+                "name": "Doggers",
+                "logo": "Doggers.png",
+                "url": "https://www.yandex.ru/",
+                "position": "Frontend Developer",
+                "time": "2024 July - October",
+                "stack" : ["React", "TS", "SCSS", "Redux", "RTK Query", "Phaser"]
+            }
+        ]
+    },
+    "projects": {
+        "title": {
+            "en":"Projects",
+            "ru":"Проекты"
+        },
+        "descr" : "Lorema Lorema lorema",
+        "data": [
+            {
+                "name": "MISIS",
+                "logo": "Doggers.png",
+                "url": "https://www.yandex.ru/",
+                "position": "Frontend Developer",
+                "time": "2024 May - August",
+                "stack" : ["Svelte", "SvelteKit","TS", "SCSS"]
+            },
+            {
+                "name": "Doggers",
+                "logo": "Doggers.png",
+                "url": "https://www.yandex.ru/",
+                "position": "Frontend Developer",
+                "time": "2024 July - October",
+                "stack" : ["React", "TS", "SCSS", "Redux", "RTK Query", "Phaser"]
+            }
+        ]
+    }
+}

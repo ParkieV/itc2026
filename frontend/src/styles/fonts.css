@@ -1,0 +1,30 @@
+@font-face {
+    font-weight: 400; /* Соответствует значению normal */
+    font-family: "Suisse Intl";
+    src: url("/Suisse_Intl/SuisseIntl-Regular.otf") format("opentype");
+}
+@font-face {
+    font-weight: 450; /* Соответствует значению normal */
+    font-family: "Suisse Intl";
+    src: url("/Suisse_Intl/SuisseIntl-Book.otf") format("opentype");
+}
+@font-face {
+    font-weight: 500; /* Соответствует значению normal */
+    font-family: "Suisse Intl";
+    src: url("/Suisse_Intl/SuisseIntl-Medium.otf") format("opentype");
+}
+@font-face {
+    font-weight: 600; /* Соответствует значению normal */
+    font-family: "Suisse Intl";
+    src: url("/Suisse_Intl/SuisseIntl-SemiBold.otf") format("opentype");
+}
+@font-face {
+    font-weight: 700; /* Соответствует значению normal */
+    font-family: "Suisse Intl";
+    src: url("Suisse_Intl/SuisseIntl-Bold.otf") format("opentype");
+}
+@font-face {
+    font-weight: 800; /* Соответствует значению normal */
+    font-family: "Suisse Intl";
+    src: url("/Suisse_Intl/SuisseIntl-Medium.otf") format("opentype");
+}
