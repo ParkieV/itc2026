@@ -6,6 +6,7 @@ from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from starlette.responses import FileResponse
 
+from services.get_origin_document.exceptions import DocumentNotAllowed, DocumentNotFound
 from services.get_origin_document.service import GetOriginDocumentService
 from .dependencies.get_current_client_id import get_current_client_id
 from .dtos.v1_cabinet_document_file_get import (
@@ -14,9 +15,6 @@ from .dtos.v1_cabinet_document_file_get import (
     V1_CABINET_DOCUMENT_FILE_GET_RESPONSE404,
 )
 from .dtos.helper import openapi_responses
-from services.get_pdf_document.exceptions import DocumentNotFound
-from services.get_pdf_document.exceptions import DocumentNotAllowed
-
 
 router = APIRouter()
 
