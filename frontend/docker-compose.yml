@@ -3,7 +3,12 @@ name: emk-frontend
 services:
   frontend:
     container_name: frontend
-    image: ${FRONTEND_IMAGE?error}:${FRONTEND_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL?error}
+    image: itc2026-frontend:local
     restart: unless-stopped
     ports:
       - "3000:80"

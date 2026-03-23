@@ -36,4 +36,4 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL || 'http://localhost:3000' }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}

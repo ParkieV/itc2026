@@ -10,14 +10,9 @@ on:
 
 permissions:
   contents: read
-  packages: write
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/itc2026-frontend
 
 jobs:
-  build_and_push:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,52 +35,23 @@ jobs:
         working-directory: frontend
         run: npm run build
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL || 'http://localhost:3000' }}
-
-      - uses: docker/setup-buildx-action@v3
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            type=sha
-
-      - uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VITE_API_URL=${{ vars.VITE_API_URL }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
   deploy:
-    needs: build_and_push
+    needs: checks
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to server via SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.FRONTEND_PROJECT_DIR }}
-            echo "FRONTEND_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" > .deploy.env
-            echo "FRONTEND_TAG=latest" >> .deploy.env
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
-            docker compose --env-file .deploy.env pull
-            docker compose --env-file .deploy.env up -d --remove-orphans
+            git fetch --all
+            git checkout frontend_main
+            git pull origin frontend_main
+            echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > .deploy.env
+            docker compose --env-file .deploy.env up -d --build --remove-orphans
             docker image prune -f
