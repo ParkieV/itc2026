@@ -6,7 +6,6 @@ from dishka import Provider, provide, Scope, make_async_container
 from config import AppConfig, JWTSettings, HTTPServerSettings
 from security.jwt_provider import JWTProvider
 from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
-
 from services.authenticate_user.service import AuthenticateUserService
 from services.get_user.service import GetUserService
 from services.issue_access_token import IssueAccessTokenService

@@ -17,23 +17,21 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 FROM base AS builder
 
-RUN apk add --no-cache curl git
-
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN curl -LsSf https://astral.sh/uv/install.sh | \
+    env UV_INSTALL_DIR=/usr/local/bin sh
 
 WORKDIR /build
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-dev --no-install-project --no-editable --compile-bytecode --link-mode=copy \
+    uv sync --frozen --no-dev --no-install-project --no-editable --compile-bytecode --link-mode=copy
 
 COPY src/app /build/src/app
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    --mount=type=bind,source=.git,target=.git \
     --mount=type=bind,source=README.md,target=README.md \
     uv sync --frozen --no-dev --no-editable --compile-bytecode --link-mode=copy
 
@@ -70,4 +68,4 @@ RUN touch /~build.rev.${GIT_COMMIT}.txt && touch /~build.tag.${IMAGE_TAG}.txt &&
 
 RUN echo "Built rev: ${GIT_COMMIT}"
 
-ENTRYPOINT ["python", "src/app/main.py"]
+ENTRYPOINT ["python", "home/app/main.py"]
