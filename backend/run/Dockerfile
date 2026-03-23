@@ -68,4 +68,4 @@ RUN touch /~build.rev.${GIT_COMMIT}.txt && touch /~build.tag.${IMAGE_TAG}.txt &&
 
 RUN echo "Built rev: ${GIT_COMMIT}"
 
-ENTRYPOINT ["python", "src/app/main.py"]
+ENTRYPOINT ["python", "home/app/main.py"]
