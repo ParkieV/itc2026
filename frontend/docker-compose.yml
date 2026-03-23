@@ -11,4 +11,4 @@ services:
     image: itc2026-frontend:local
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "80:80"

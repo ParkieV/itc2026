@@ -5,7 +5,12 @@ on:
     branches: [frontend_main]
     paths:
       - 'frontend/**'
-      - '.github/workflows/ci.frontend.yml'
+      - '.github/workflows/deploy.frontend.yml'
+  pull_request:
+    types: [closed]
+    branches: [main]
+    paths:
+      - 'frontend/**'
       - '.github/workflows/deploy.frontend.yml'
 
 permissions:
@@ -13,6 +18,11 @@ permissions:
 
 jobs:
   checks:
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref == 'frontend_main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +49,10 @@ jobs:
 
   deploy:
     needs: checks
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref == 'frontend_main'
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to server via SSH
@@ -48,10 +62,34 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.FRONTEND_PROJECT_DIR }}
+            set -euo pipefail
+
+            cd "${{ secrets.FRONTEND_PROJECT_DIR }}"
+
+            if [ -d ".git" ]; then
+              REPO_DIR="$PWD"
+            elif [ -d "../.git" ]; then
+              REPO_DIR="$(cd .. && pwd)"
+            else
+              echo "ERROR: git repository not found near FRONTEND_PROJECT_DIR=$PWD"
+              exit 1
+            fi
+
+            cd "$REPO_DIR"
             git fetch --all
-            git checkout frontend_main
-            git pull origin frontend_main
+            git checkout main
+            git pull origin main
+
+            if [ -f "frontend/docker-compose.yml" ]; then
+              COMPOSE_DIR="$REPO_DIR/frontend"
+            elif [ -f "docker-compose.yml" ]; then
+              COMPOSE_DIR="$REPO_DIR"
+            else
+              echo "ERROR: docker-compose.yml not found in $REPO_DIR or $REPO_DIR/frontend"
+              exit 1
+            fi
+
+            cd "$COMPOSE_DIR"
             echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > .deploy.env
             docker compose --env-file .deploy.env up -d --build --remove-orphans
             docker image prune -f
