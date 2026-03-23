@@ -1,14 +1,10 @@
 
-name: Deploy Docker Compose App
+name: Deploy backend
 
 on:
-  pull_request:
-    types: [closed]
-    branches: [main]
-    paths:
-      - 'backend/**'
-      - 'infra/**'
-      - '.github/workflows/main.yml'
+  push:
+    branches:
+      - backend/main
 
 jobs:
   deploy:
