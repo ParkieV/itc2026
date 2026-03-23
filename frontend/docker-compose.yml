@@ -6,4 +6,4 @@ services:
     image: ${FRONTEND_IMAGE?error}:${FRONTEND_TAG:-latest}
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "3000:80"
