@@ -34,11 +34,11 @@ router = APIRouter()
 )
 @inject
 async def cabinet_document_pdf_file(
-    get_document_service: FromDishka[GetPdfDocumentService],
+    get_pdf_document_service: FromDishka[GetPdfDocumentService],
     document_id: int = Query(),
 ) -> FileResponse:
     try:
-        document = await get_document_service.execute(document_id)
+        document = await get_pdf_document_service.execute(document_id)
     except DocumentNotFound as err_not_found:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(err_not_found)) from err_not_found
     except DocumentNotAllowed as err_not_allowed:
