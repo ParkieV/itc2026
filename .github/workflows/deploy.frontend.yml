@@ -90,6 +90,10 @@ jobs:
             fi
 
             cd "$COMPOSE_DIR"
+            if [ -z "${{ secrets.VITE_API_URL }}" ]; then
+              echo "ERROR: GitHub secret VITE_API_URL is empty"
+              exit 1
+            fi
             echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > .deploy.env
             docker compose --env-file .deploy.env up -d --build --remove-orphans
             docker image prune -f
