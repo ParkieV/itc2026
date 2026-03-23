@@ -1,1 +1,29 @@
+name: Deploy Docker Compose App
 
+on:
+  push:
+    branches:
+      - backend/cicd
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd ${{ secrets.PROJECT_DIR }}
+            git switch ${{github.ref}}
+            git pull origin ${{ github.ref }}
+            docker compose up --build -d
+          EOF
