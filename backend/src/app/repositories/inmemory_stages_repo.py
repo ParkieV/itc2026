@@ -1,0 +1,41 @@
+import pandas as pd
+
+from entities.stage import Stage
+from repositories.stage_exceptions import StageNotFound
+
+
+class AsyncInMemoryStagesRepository:
+    def __init__(self):
+        self._stages = pd.DataFrame(
+            [
+                {"stage_id": 1, "next_stage": 2, "title": "Stage 1"},
+                {"stage_id": 2, "next_stage": 0, "title": "Stage 2"},
+            ]
+        ).set_index("stage_id")
+
+    @property
+    def stages(self) -> pd.DataFrame:
+        return self._stages.copy()
+
+    async def list_all(self) -> list[Stage]:
+        df = self.stages.reset_index()
+        return [
+            Stage(
+                stage_id=int(row["stage_id"]),
+                next_stage=int(row["next_stage"]),
+                title=str(row["title"]),
+            )
+            for _, row in df.iterrows()
+        ]
+
+    async def get_by_id(self, stage_id: int) -> Stage:
+        try:
+            row = self.stages.loc[stage_id]
+        except KeyError:
+            raise StageNotFound(f"stage with id={stage_id} not found") from None
+
+        return Stage(
+            stage_id=int(row.name),
+            next_stage=int(row["next_stage"]),
+            title=str(row["title"]),
+        )
