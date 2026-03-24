@@ -7,11 +7,27 @@ from fastapi import Depends, HTTPException, APIRouter
 from handlers.dependencies.get_current_client_id import get_current_client_id
 from services.get_user.service import GetUserService
 from services.get_user import exceptions
-from .dtos.v1_cabinet_client_get import V1CabinetClientGetResponse
+from .dtos.helper import openapi_responses
+from .dtos.v1_cabinet_client_get import (
+    V1_CABINET_CLIENT_GET_RESPONSE200,
+    V1_CABINET_CLIENT_GET_RESPONSE401,
+    V1_CABINET_CLIENT_GET_RESPONSE404,
+    V1CabinetClientGetResponse,
+)
 
 router = APIRouter()
 
-@router.get("/v1/cabinet/client")
+
+@router.get(
+    "/v1/cabinet/client",
+    responses=openapi_responses(
+        {
+            200: V1_CABINET_CLIENT_GET_RESPONSE200,
+            401: V1_CABINET_CLIENT_GET_RESPONSE401,
+            404: V1_CABINET_CLIENT_GET_RESPONSE404,
+        }
+    ),
+)
 @inject
 async def cabinet_client(
         get_client_service: FromDishka[GetUserService],
