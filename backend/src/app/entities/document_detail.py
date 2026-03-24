@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from entities.comment import Comment
 from entities.document import Document
 from entities.review import Review
 
@@ -8,3 +9,4 @@ from entities.review import Review
 class DocumentDetail:
     document: Document
     reviews: list[Review]
+    comments: list[Comment]

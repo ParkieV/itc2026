@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from handlers.dtos.v1_cabinett_document_comments import V1CabinettDocumentCommentResponse
+
 
 class V1CabinetDocumentGetDocumentResponse(BaseModel):
     title: str
@@ -23,10 +25,13 @@ class V1CabinetDocumentGetReviewResponse(BaseModel):
 class V1CabinetDocumentGetResponse(BaseModel):
     document: V1CabinetDocumentGetDocumentResponse
     reviews: list[V1CabinetDocumentGetReviewResponse]
+    comments: list[V1CabinettDocumentCommentResponse] = Field(
+        description="Комментарии к документу на текущем этапе (doc_id и stage_id документа).",
+    )
 
 
 class V1_CABINET_DOCUMENT_GET_RESPONSE200(V1CabinetDocumentGetResponse):
-    """Информация о документе."""
+    """Информация о документе, ревью и комментариях на текущем этапе."""
 
 
 class V1_CABINET_DOCUMENT_GET_RESPONSE401(BaseModel):

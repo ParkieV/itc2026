@@ -205,8 +205,13 @@ class AsyncAppProvider(Provider):
         self,
         get_pdf_document_service: GetPdfDocumentService,
         reviews_repo: AsyncInMemoryReviewsRepository,
+        comments_repo: AsyncInMemoryCommentsRepository,
     ) -> GetDocumentDetailUseCase:
-        return GetDocumentDetailUseCase(get_pdf_document_service, reviews_repo)
+        return GetDocumentDetailUseCase(
+            get_pdf_document_service,
+            reviews_repo,
+            comments_repo,
+        )
 
     @provide
     async def get_stages_with_reviewer_and_docs_uc(
