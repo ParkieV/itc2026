@@ -63,6 +63,7 @@ async def create_cabinet_document_file(
                 stage_id=1,
             ),
             upload_file=file,
+            creator_user_id=current_client_id,
         )
     except (
         InvalidDocumentFormat,
