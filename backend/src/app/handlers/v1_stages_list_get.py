@@ -39,6 +39,7 @@ async def list_stages(
             ),
             docs=[
                 DocumentGetResponse(
+                    doc_id=d.doc_id,
                     title=d.title,
                     description=d.description,
                     authors=d.authors,

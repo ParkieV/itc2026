@@ -79,5 +79,6 @@ class ChangeDocumentStageUseCase:
             created_at=document.created_at,
             modified_at=document.modified_at,
             pdf_file_id=document.pdf_file_id,
+            doc_id=doc_id,
         )
         await self._change_document_stage_service.execute(doc_id, updated_document)

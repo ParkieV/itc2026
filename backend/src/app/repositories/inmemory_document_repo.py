@@ -74,11 +74,12 @@ class InMemoryDocumentRepository:
             stage_id=document_model['stage_id'],
             created_at=document_model['created_at'],
             modified_at=document_model['modified_at'],
+            doc_id=document_id,
         )
 
     def get_list(self) -> list[Document]:
         out: list[Document] = []
-        for document_model in self._docs.values():
+        for key, document_model in self._docs.items():
             out.append(
                 Document(
                     title=document_model['title'],
@@ -89,6 +90,7 @@ class InMemoryDocumentRepository:
                     stage_id=document_model['stage_id'],
                     created_at=document_model['created_at'],
                     modified_at=document_model['modified_at'],
+                    doc_id=int(key),
                 )
             )
         return out
@@ -107,5 +109,6 @@ class InMemoryDocumentRepository:
             created_at=existing['created_at'],
             modified_at=now_iso_msk(),
             pdf_file_id=document.pdf_file_id,
+            doc_id=document_id,
         )
         self._docs[str(document_id)] = asdict(patched)
