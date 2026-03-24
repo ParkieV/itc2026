@@ -35,6 +35,18 @@ class AsyncInMemoryReviewsRepository:
     def rows(self) -> pd.DataFrame:
         return self._rows.copy()
 
+    async def get_all(self) -> list[Review]:
+        return [
+            Review(
+                stage_id=int(row["stage_id"]),
+                doc_id=int(row["doc_id"]),
+                user_id=int(row["user_id"]),
+                is_aproved=bool(row["is_aproved"]),
+                is_viewed=bool(row["is_viewed"]),
+            )
+            for _, row in self.rows.iterrows()
+        ]
+
     async def add(self, review: Review) -> None:
         self._rows.loc[len(self._rows)] = {
             "stage_id": review.stage_id,

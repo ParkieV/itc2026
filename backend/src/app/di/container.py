@@ -9,7 +9,6 @@ from repositories.inmemory_document_repo import InMemoryDocumentRepository
 from repositories.inmemory_reviews_repo import AsyncInMemoryReviewsRepository
 from services.get_origin_document.service import GetOriginDocumentService
 from services.get_pdf_document.service import GetPdfDocumentService
-from repositories.inmemory_stage_reviewers_repo import AsyncInMemoryStageReviewersRepository
 from repositories.inmemory_stages_repo import AsyncInMemoryStagesRepository
 from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
 from services.authenticate_user.service import AuthenticateUserService
@@ -21,6 +20,7 @@ from services.get_user.service import GetUserService
 from services.issue_access_token import IssueAccessTokenService
 from services.setup_reviewer.service import SetupReviewerService
 from usecases.authorize_user.usecase import AuthorizeUserUseCase
+from usecases.get_document_detail.usecase import GetDocumentDetailUseCase
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
 
 
@@ -50,10 +50,6 @@ class AsyncAppProvider(Provider):
     @provide
     async def stages_repo(self) -> AsyncInMemoryStagesRepository:
         return AsyncInMemoryStagesRepository()
-
-    @provide
-    async def stage_reviewers_repo(self) -> AsyncInMemoryStageReviewersRepository:
-        return AsyncInMemoryStageReviewersRepository()
 
     @provide
     async def reviews_repo(self) -> AsyncInMemoryReviewsRepository:
@@ -156,15 +152,25 @@ class AsyncAppProvider(Provider):
         )
 
     @provide
+    async def get_document_detail_uc(
+        self,
+        get_pdf_document_service: GetPdfDocumentService,
+        reviews_repo: AsyncInMemoryReviewsRepository,
+    ) -> GetDocumentDetailUseCase:
+        return GetDocumentDetailUseCase(get_pdf_document_service, reviews_repo)
+
+    @provide
     async def get_stages_with_reviewer_and_docs_uc(
         self,
         stages_repo: AsyncInMemoryStagesRepository,
-        stage_reviewers_repo: AsyncInMemoryStageReviewersRepository,
+        reviews_repo: AsyncInMemoryReviewsRepository,
         user_repo: AsyncInMemoryUserRepository,
+        document_repo: InMemoryDocumentRepository,
     ) -> GetStagesWithReviewerAndDocsUseCase:
         return GetStagesWithReviewerAndDocsUseCase(
             stages_repo,
-            stage_reviewers_repo,
+            document_repo,
+            reviews_repo,
             user_repo,
         )
 
