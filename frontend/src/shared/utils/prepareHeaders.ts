@@ -1,4 +1,4 @@
-import { RootState } from '@/store/store'
+import { RootState } from '@store/store'
 
 export const prepareHeaders = (headers: Headers, state: RootState) => {
   const token = state.auth.token;

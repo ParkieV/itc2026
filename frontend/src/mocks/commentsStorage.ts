@@ -2,7 +2,7 @@ import type {
 	CreateCommentInput,
 	DocumentComment,
 	UpdateCommentInput,
-} from '@/shared/types/comments'
+} from '@shared/types/comments'
 
 const STORAGE_KEY = 'pdf-comments-v1'
 
