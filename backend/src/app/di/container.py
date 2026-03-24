@@ -4,10 +4,14 @@ from pathlib import Path
 from dishka import Provider, provide, Scope, make_async_container
 
 from config import AppConfig, JWTSettings, HTTPServerSettings
+from repositories.inmemory_comments_repo import AsyncInMemoryCommentsRepository
 from security.jwt_provider import JWTProvider
 from repositories.inmemory_document_repo import InMemoryDocumentRepository
 from repositories.inmemory_reviews_repo import AsyncInMemoryReviewsRepository
 from services.get_origin_document.service import GetOriginDocumentService
+from services.create_comment.service import CreateCommentService
+from services.get_comments_by_doc.service import GetCommentsByDocService
+from services.get_comments_by_doc_and_stage.service import GetCommentsByDocAndStageService
 from services.get_pdf_document.service import GetPdfDocumentService
 from repositories.inmemory_stages_repo import AsyncInMemoryStagesRepository
 from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
@@ -54,6 +58,10 @@ class AsyncAppProvider(Provider):
     @provide
     async def reviews_repo(self) -> AsyncInMemoryReviewsRepository:
         return AsyncInMemoryReviewsRepository()
+
+    @provide
+    async def comments_repo(self) -> AsyncInMemoryCommentsRepository:
+        return AsyncInMemoryCommentsRepository()
 
     @provide
     async def authenticate_user_service(self, user_repo: AsyncInMemoryUserRepository) -> AuthenticateUserService:
@@ -149,6 +157,47 @@ class AsyncAppProvider(Provider):
             get_user_service,
             get_stage_by_id_service,
             get_pdf_document_service,
+        )
+
+    @provide
+    async def get_comments_by_doc_and_stage_service(
+        self,
+        comments_repo: AsyncInMemoryCommentsRepository,
+        get_pdf_document_service: GetPdfDocumentService,
+        get_stage_by_id_service: GetStageByIdService,
+    ) -> GetCommentsByDocAndStageService:
+        return GetCommentsByDocAndStageService(
+            comments_repo,
+            get_pdf_document_service,
+            get_stage_by_id_service,
+        )
+
+    @provide
+    async def get_comments_by_doc_service(
+        self,
+        comments_repo: AsyncInMemoryCommentsRepository,
+        get_pdf_document_service: GetPdfDocumentService,
+        get_stage_by_id_service: GetStageByIdService,
+    ) -> GetCommentsByDocService:
+        return GetCommentsByDocService(
+            comments_repo,
+            get_pdf_document_service,
+            get_stage_by_id_service,
+        )
+
+    @provide
+    async def create_comment_service(
+        self,
+        comments_repo: AsyncInMemoryCommentsRepository,
+        get_pdf_document_service: GetPdfDocumentService,
+        get_stage_by_id_service: GetStageByIdService,
+        get_user_service: GetUserService,
+    ) -> CreateCommentService:
+        return CreateCommentService(
+            comments_repo,
+            get_pdf_document_service,
+            get_stage_by_id_service,
+            get_user_service,
         )
 
     @provide
