@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from entities.review_status import ReviewStatus
+
 from handlers.dtos.v1_cabinett_document_comments import V1CabinettDocumentCommentResponse
 
 
@@ -18,7 +20,7 @@ class V1CabinetDocumentGetReviewResponse(BaseModel):
     stage_id: int
     doc_id: int
     user_id: int
-    is_aproved: bool
+    status: ReviewStatus | None = None
     is_viewed: bool
 
 

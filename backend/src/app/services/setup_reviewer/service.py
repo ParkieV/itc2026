@@ -33,7 +33,7 @@ class SetupReviewerService:
                 stage_id=stage_id,
                 doc_id=doc_id,
                 user_id=user_id,
-                is_aproved=False,
                 is_viewed=False,
+                status=None,
             )
         )

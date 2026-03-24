@@ -22,11 +22,13 @@ class ChangeReviewViewStatusService:
         doc_id: int,
         user_id: int,
         stage_id: int,
-        is_viewed: bool,
+        is_viewed: bool | None = None,
     ) -> int:
         await self._get_user_service.execute(user_id)
         await self._get_stage_by_id_service.execute(stage_id)
         await self._get_pdf_document_service.execute(doc_id)
+        if is_viewed is None:
+            return 0
         return await self._reviews_repo.update_view_status(
             stage_id=stage_id,
             doc_id=doc_id,

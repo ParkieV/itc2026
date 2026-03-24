@@ -3,7 +3,7 @@ from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, Depends, HTTPException
 
 from handlers.dependencies.get_current_client_id import get_current_client_id
-from services.change_review_aprove_status.service import ChangeReviewAproveStatusService
+from services.change_review_status.service import ChangeReviewStatusService
 from services.change_review_view_status.service import ChangeReviewViewStatusService
 from services.get_pdf_document.exceptions import DocumentNotFound
 from services.get_stage_by_id.exceptions import StageNotFound
@@ -14,11 +14,12 @@ from .dtos.helper import openapi_responses
 from .dtos.v1_cabinet_reviews_post import (
     V1_CABINET_REVIEWS_POST_RESPONSE400,
     V1_CABINET_REVIEWS_POST_RESPONSE200,
-    V1_CABINET_REVIEWS_APROVE_POST_RESPONSE200,
+    V1_CABINET_REVIEWS_STATUS_POST_RESPONSE200,
     V1_CABINET_REVIEWS_POST_RESPONSE401,
     V1_CABINET_REVIEWS_POST_RESPONSE404,
     V1_CABINET_REVIEWS_VIEW_POST_RESPONSE200,
     V1CabinetReviewsCreateRequest,
+    V1CabinetReviewsStatusRequest,
     V1CabinetReviewsUpdateRequest,
 )
 
@@ -81,27 +82,27 @@ async def cabinet_reviews_view(
 
 
 @router.post(
-    "/v1/cabinet/reviews/aprove",
+    "/v1/cabinet/reviews/status",
     responses=openapi_responses(
         {
-            200: V1_CABINET_REVIEWS_APROVE_POST_RESPONSE200,
+            200: V1_CABINET_REVIEWS_STATUS_POST_RESPONSE200,
             401: V1_CABINET_REVIEWS_POST_RESPONSE401,
             404: V1_CABINET_REVIEWS_POST_RESPONSE404,
         }
     ),
 )
 @inject
-async def cabinet_reviews_aprove(
-    request: V1CabinetReviewsUpdateRequest,
-    change_review_aprove_status_service: FromDishka[ChangeReviewAproveStatusService],
+async def cabinet_reviews_status(
+    request: V1CabinetReviewsStatusRequest,
+    change_review_status_service: FromDishka[ChangeReviewStatusService],
     user_id: str = Depends(get_current_client_id),
 ) -> None:
     try:
-        await change_review_aprove_status_service.execute(
+        await change_review_status_service.execute(
             doc_id=request.doc_id,
             user_id=int(user_id),
             stage_id=request.stage_id,
-            is_aproved=True,
+            status=request.status,
         )
     except (UserNotFound, StageNotFound, DocumentNotFound) as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found

@@ -1,9 +1,17 @@
 from pydantic import BaseModel, Field
 
+from entities.review_status import ReviewStatus
+
 
 class V1CabinetReviewsUpdateRequest(BaseModel):
     doc_id: int
     stage_id: int
+
+
+class V1CabinetReviewsStatusRequest(BaseModel):
+    doc_id: int
+    stage_id: int
+    status: ReviewStatus
 
 
 class V1CabinetReviewsCreateRequest(BaseModel):
@@ -16,8 +24,8 @@ class V1_CABINET_REVIEWS_VIEW_POST_RESPONSE200(BaseModel):
     """Статус просмотра ревью успешно обновлен."""
 
 
-class V1_CABINET_REVIEWS_APROVE_POST_RESPONSE200(BaseModel):
-    """Статус подтверждения ревью успешно обновлен."""
+class V1_CABINET_REVIEWS_STATUS_POST_RESPONSE200(BaseModel):
+    """Статус ревью успешно обновлён."""
 
 
 class V1_CABINET_REVIEWS_POST_RESPONSE200(BaseModel):

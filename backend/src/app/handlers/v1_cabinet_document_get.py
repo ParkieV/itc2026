@@ -56,7 +56,7 @@ async def cabinet_document_get(
                 stage_id=i.stage_id,
                 doc_id=i.doc_id,
                 user_id=i.user_id,
-                is_aproved=i.is_aproved,
+                status=i.status,
                 is_viewed=i.is_viewed,
             )
             for i in detail.reviews

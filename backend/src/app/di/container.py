@@ -17,7 +17,7 @@ from services.get_pdf_document.service import GetPdfDocumentService
 from repositories.inmemory_stages_repo import AsyncInMemoryStagesRepository
 from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
 from services.authenticate_user.service import AuthenticateUserService
-from services.change_review_aprove_status.service import ChangeReviewAproveStatusService
+from services.change_review_status.service import ChangeReviewStatusService
 from services.change_review_view_status.service import ChangeReviewViewStatusService
 from services.get_stage_by_id.service import GetStageByIdService
 from services.get_stages_service.service import GetStagesService
@@ -131,14 +131,14 @@ class AsyncAppProvider(Provider):
         )
 
     @provide
-    async def change_review_aprove_status_service(
+    async def change_review_status_service(
         self,
         reviews_repo: AsyncInMemoryReviewsRepository,
         get_user_service: GetUserService,
         get_stage_by_id_service: GetStageByIdService,
         get_pdf_document_service: GetPdfDocumentService,
-    ) -> ChangeReviewAproveStatusService:
-        return ChangeReviewAproveStatusService(
+    ) -> ChangeReviewStatusService:
+        return ChangeReviewStatusService(
             reviews_repo,
             get_user_service,
             get_stage_by_id_service,
