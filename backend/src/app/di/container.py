@@ -43,6 +43,7 @@ from services.change_doc_stage.service import ChangeDocumentStageService
 from services.get_stage_by_id.service import GetStageByIdService
 from services.get_stages_service.service import GetStagesService
 from usecases.change_doc_stage.usecase import ChangeDocumentStageUseCase
+from usecases.get_document_user_status.usecase import GetDocumentUserStatusUseCase
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
 from services.notification import InAppUserNotifier, Notifier
 from services.user_in_app_notification.service import UserInAppNotificationService
@@ -354,6 +355,19 @@ class AsyncAppProvider(Provider):
             get_pdf_document_service,
             reviews_repo,
             comments_repo,
+        )
+
+    @provide
+    async def get_document_user_status_uc(
+        self,
+        get_pdf_document_service: GetPdfDocumentService,
+        comments_repo: AsyncInMemoryCommentsRepository,
+        reviews_repo: AsyncInMemoryReviewsRepository,
+    ) -> GetDocumentUserStatusUseCase:
+        return GetDocumentUserStatusUseCase(
+            get_pdf_document_service,
+            comments_repo,
+            reviews_repo,
         )
 
     @provide
