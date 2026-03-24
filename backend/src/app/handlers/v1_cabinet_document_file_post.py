@@ -45,7 +45,6 @@ async def create_cabinet_document_file(
     get_origin_document_service: FromDishka[GetOriginDocumentService],
     title: str = Form(...),
     description: str = Form(...),
-    stage_id: int = Form(...),
     authors: list[int] = Form(...),
     file: UploadFile = File(...),
     client_id: str = Depends(get_current_client_id),
@@ -61,7 +60,7 @@ async def create_cabinet_document_file(
                 title=title,
                 description=description,
                 authors=normalized_authors,
-                stage_id=stage_id,
+                stage_id=0,
             ),
             upload_file=file,
         )
