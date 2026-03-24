@@ -10,7 +10,12 @@ class UploadedFileLike(Protocol):
 
 class InMemoryDocumentFilesRepository:
     def __init__(self) -> None:
-        self._paths_by_file_id: dict[str, dict[str, str | None]] = {}
+        self._paths_by_file_id: dict[int, dict[str, str | None]] = {
+            1: {
+                "origin_file_path": "src/static/origins/test.docx",
+                "pdf_file_path": "src/static/pdfs/test.pdf",
+            }
+        }
         self._count = 1
 
     def get_next_file_id(self) -> int:
