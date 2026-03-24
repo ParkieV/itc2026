@@ -24,6 +24,8 @@ services:
       - db
     ports:
       - "8000:8000"
+    env_file:
+      - ../backend/run/.env
     build:
       context: ../backend
       dockerfile: ../backend/run/Dockerfile
