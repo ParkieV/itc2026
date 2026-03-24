@@ -148,6 +148,10 @@
 }
 .taskInfoItem {
 	font-size: 16px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
 }
 .taskInfoItemLabel {
 	display: flex;

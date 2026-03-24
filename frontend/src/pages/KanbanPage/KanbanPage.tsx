@@ -265,7 +265,7 @@ export const KanbanPage: FC = () => {
 											<span className={cls.taskInfoItem}>
 												<span className={cls.taskInfoItemLabel}>
 													<UserCircleIcon size={24} />
-													Автор:
+													автор:
 												</span>{' '}
 												{task.author}
 											</span>
