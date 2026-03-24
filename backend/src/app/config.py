@@ -2,6 +2,7 @@ from enum import Enum
 from functools import cached_property
 from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +18,10 @@ class AppConfig(BaseSettings):
 
     run_mode: RunMode = 'dev'
     archive_base_dir: Path = Path(__file__).parents[2]
+    internal_notification_api_key: str | None = Field(
+        default=None,
+        description="X-Internal-Notification-Key для POST /v1/user-notifications; в dev пусто = без заголовка.",
+    )
 
     def is_dev(self) -> bool:
         return self.run_mode == RunMode.DEV
@@ -52,3 +57,14 @@ class JWTSettings(BaseSettings):
     private_key_path: str
     public_key_path: str
     algorithm: str
+
+
+class NotificationSettings(BaseSettings):
+    """Env prefix NOTIFY_. Судьи (JUDGE_EMAILS) используются для писем только если в событии нет user_ids."""
+
+    model_config = SettingsConfigDict(env_file_encoding='utf-8', extra='ignore', env_prefix="NOTIFY_")
+
+    resend_api_key: str | None = None
+    mail_from: str | None = None
+    judge_emails: str = ""
+    webhook_url: str | None = None

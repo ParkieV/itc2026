@@ -5,7 +5,7 @@ import pandas as pd
 from entities.user import User
 
 class AsyncInMemoryUserRepository:
-    _columns: Final = ["user_id", "login", "password", "scope", "fio"]
+    _columns: Final = ["user_id", "login", "password", "scope", "fio", "email"]
 
     def __init__(self):
         self._users = pd.DataFrame(
@@ -16,6 +16,7 @@ class AsyncInMemoryUserRepository:
                     "password": "password123",
                     "scope": "user",
                     "fio": "Тестовый Пользователь",
+                    "email": "test_user@example.com",
                 },
                 {
                     "user_id": 2,
@@ -23,6 +24,7 @@ class AsyncInMemoryUserRepository:
                     "password": "password123",
                     "scope": "user",
                     "fio": "Тестовый Пользователь",
+                    "email": "yarik@example.com",
                 },
                 {
                     "user_id": 3,
@@ -30,7 +32,8 @@ class AsyncInMemoryUserRepository:
                     "password": "password123",
                     "scope": "user",
                     "fio": "Тестовый Пользователь",
-                }
+                    "email": "timosha@example.com",
+                },
             ]
         ).set_index(["user_id", "login"])
 
@@ -51,6 +54,7 @@ class AsyncInMemoryUserRepository:
             password=user_dict["password"],
             scope=user_dict["scope"],
             fio=user_dict["fio"],
+            email=str(user_dict.get("email", "") or ""),
         )
 
     async def get_by_id(self, user_id: int) -> User | None:
@@ -66,4 +70,5 @@ class AsyncInMemoryUserRepository:
             password=user_dict["password"],
             scope=user_dict["scope"],
             fio=user_dict["fio"],
+            email=str(user_dict.get("email", "") or ""),
         )
