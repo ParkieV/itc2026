@@ -1,0 +1,2 @@
+class StageNotFound(Exception):
+    pass

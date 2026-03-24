@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from typing import Any
 
+from entities.document import Document
 from entities.stage import Stage
 from entities.user import User
 
@@ -8,5 +8,5 @@ from entities.user import User
 @dataclass(frozen=True, slots=True)
 class StageWithReviewerAndDocs:
     stage: Stage
-    docs: list[Any]
+    docs: list[Document]
     reviewers: list[User]

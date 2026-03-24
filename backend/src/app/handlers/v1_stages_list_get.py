@@ -4,6 +4,7 @@ from handlers.dependencies.get_current_client_id import get_current_client_id
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
 from .dtos.helper import openapi_responses
 from .dtos.v1_stages_list_get import (
+    DocumentGetResponse,
     StageReviewerUserGetResponse,
     StageSummaryGetResponse,
     V1_STAGES_LIST_GET_RESPONSE200,
@@ -15,7 +16,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/v1/stages",
+    "/v1/cabinet/stages",
     responses=openapi_responses(
         {
             200: V1_STAGES_LIST_GET_RESPONSE200,
@@ -36,7 +37,16 @@ async def list_stages(
                 next_stage=row.stage.next_stage,
                 title=row.stage.title,
             ),
-            docs=list(row.docs),
+            docs=[
+                DocumentGetResponse(
+                    title=d.title,
+                    description=d.description,
+                    authors=d.authors,
+                    created_at=d.created_at,
+                    modified_at=d.modified_at,
+                )
+                for d in row.docs
+            ],
             reviewers=[
                 StageReviewerUserGetResponse(
                     user_id=u.user_id,
