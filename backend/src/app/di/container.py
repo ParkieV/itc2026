@@ -327,12 +327,14 @@ class AsyncAppProvider(Provider):
         get_pdf_document_service: GetPdfDocumentService,
         get_stage_by_id_service: GetStageByIdService,
         get_user_service: GetUserService,
+        notifier: Notifier,
     ) -> CreateCommentService:
         return CreateCommentService(
             comments_repo,
             get_pdf_document_service,
             get_stage_by_id_service,
             get_user_service,
+            notifier,
         )
 
     @provide
