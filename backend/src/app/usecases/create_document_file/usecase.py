@@ -7,6 +7,8 @@ from services.notification import NotificationEvent, Notifier
 from services.save_pdf_document_file.service import SavePdfDocumentFileService
 from services.add_document.service import AddDocumentService
 
+_PUBLIC_DOCUMENT_PDF_URL_PREFIX = "http://itc2026.parkie.tech/pdf"
+
 
 class CreateDocumentFileUseCase:
     def __init__(
@@ -23,7 +25,12 @@ class CreateDocumentFileUseCase:
         self._save_pdf_document_file_service = save_pdf_document_file_service
         self._notifier = notifier
 
-    async def execute(self, document: Document, upload_file: UploadedFileLike) -> int:
+    async def execute(
+        self,
+        document: Document,
+        upload_file: UploadedFileLike,
+        creator_user_id: int,
+    ) -> int:
         for author_id in document.authors:
             try:
                 await self._get_user_service.execute(author_id)
@@ -49,23 +56,28 @@ class CreateDocumentFileUseCase:
                 pdf_file_id=pdf_file_id,
             )
         )
-        await self._notifier.notify(
-            NotificationEvent(
-                event_type="document.file_created",
-                subject=f"Новый документ: {document.title}",
-                body=(
-                    f"Загружен документ «{document.title}» (id={document_id}). "
-                    f"Авторы (id): {', '.join(str(a) for a in document.authors)}."
-                ),
-                payload={
-                    "event_type": "document.file_created",
-                    "document_id": document_id,
-                    "title": document.title,
-                    "authors": list(document.authors),
-                    "file_id": file_id,
-                    "pdf_file_id": pdf_file_id,
-                },
-                user_ids=tuple(document.authors),
+        doc_url = f"{_PUBLIC_DOCUMENT_PDF_URL_PREFIX}/{document_id}"
+        coauthor_ids = tuple(a for a in document.authors if a != creator_user_id)
+        if coauthor_ids:
+            await self._notifier.notify(
+                NotificationEvent(
+                    event_type="document.file_created",
+                    subject=f"Новый документ: {document.title}",
+                    body=(
+                        f"Создан документ «{document.title}», в котором вы указаны соавтором.\n"
+                        f"Открыть PDF на сайте: {doc_url}"
+                    ),
+                    payload={
+                        "event_type": "document.file_created",
+                        "document_id": document_id,
+                        "document_url": doc_url,
+                        "title": document.title,
+                        "authors": list(document.authors),
+                        "creator_user_id": creator_user_id,
+                        "file_id": file_id,
+                        "pdf_file_id": pdf_file_id,
+                    },
+                    user_ids=coauthor_ids,
+                )
             )
-        )
         return document_id
