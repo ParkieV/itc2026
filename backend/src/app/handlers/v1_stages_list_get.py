@@ -1,6 +1,7 @@
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Depends
 from handlers.dependencies.get_current_client_id import get_current_client_id
+from usecases.get_document_user_status.usecase import GetDocumentUserStatusUseCase
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
 from .dtos.helper import openapi_responses
 from .dtos.v1_stages_list_get import (
@@ -27,9 +28,11 @@ router = APIRouter()
 @inject
 async def list_stages(
     get_stages_with_reviewer_and_docs_uc: FromDishka[GetStagesWithReviewerAndDocsUseCase],
-    _: str = Depends(get_current_client_id),
+    get_document_user_status_uc: FromDishka[GetDocumentUserStatusUseCase],
+    user_id: str = Depends(get_current_client_id),
 ) -> list[V1StageWithReviewerAndDocsGetResponse]:
     stages = await get_stages_with_reviewer_and_docs_uc.execute()
+    uid = int(user_id)
     return [
         V1StageWithReviewerAndDocsGetResponse(
             stage=StageSummaryGetResponse(
@@ -45,6 +48,9 @@ async def list_stages(
                     authors=d.authors,
                     created_at=d.created_at or "",
                     modified_at=d.modified_at or "",
+                    status=await get_document_user_status_uc.status_for_user(d.doc_id, uid)
+                    if d.doc_id is not None
+                    else None,
                 )
                 for d in row.docs
             ],

@@ -5,6 +5,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field, RootModel
 
+from entities.document_user_status import DocumentUserStatus
+
 
 class StageGetResponse(BaseModel):
     stage_id: int
@@ -32,6 +34,10 @@ class DocumentGetResponse(BaseModel):
     authors: list[int]
     created_at: str
     modified_at: str
+    status: DocumentUserStatus | None = Field(
+        default=None,
+        description="Статус документа для текущего пользователя; null, если не автор и не ревьюер.",
+    )
 
 
 class V1StageWithReviewerAndDocsGetResponse(BaseModel):

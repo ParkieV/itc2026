@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from handlers.dependencies.get_current_client_id import get_current_client_id
 from services.get_pdf_document.exceptions import DocumentNotFound
 from usecases.get_document_detail.usecase import GetDocumentDetailUseCase
+from usecases.get_document_user_status.usecase import GetDocumentUserStatusUseCase
 from .dtos.helper import openapi_responses
 from .dtos.v1_cabinet_document_get import (
     V1_CABINET_DOCUMENT_GET_RESPONSE200,
@@ -33,12 +34,15 @@ router = APIRouter()
 async def cabinet_document_get(
     doc_id: int,
     get_document_detail_uc: FromDishka[GetDocumentDetailUseCase],
-    _: str = Depends(get_current_client_id),
+    get_document_user_status_uc: FromDishka[GetDocumentUserStatusUseCase],
+    user_id: str = Depends(get_current_client_id),
 ) -> V1CabinetDocumentGetResponse:
     try:
         detail = await get_document_detail_uc.execute(doc_id)
     except DocumentNotFound as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
+
+    status = await get_document_user_status_uc.status_for_user(doc_id, int(user_id))
 
     return V1CabinetDocumentGetResponse(
         document=V1CabinetDocumentGetDocumentResponse(
@@ -50,6 +54,7 @@ async def cabinet_document_get(
             created_at=detail.document.created_at or "",
             modified_at=detail.document.modified_at or "",
             pdf_file_id=detail.document.pdf_file_id,
+            status=status,
         ),
         reviews=[
             V1CabinetDocumentGetReviewResponse(
