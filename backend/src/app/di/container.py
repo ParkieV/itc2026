@@ -3,7 +3,7 @@ from pathlib import Path
 
 from dishka import Provider, provide, Scope, make_async_container
 
-from config import AppConfig, JWTSettings, HTTPServerSettings, NotificationSettings
+from config import AppConfig, JWTSettings, HTTPServerSettings
 from repositories.inmemory_comments_repo import AsyncInMemoryCommentsRepository
 from security.jwt_provider import JWTProvider
 from repositories.inmemory_document_repo import InMemoryDocumentRepository
@@ -44,13 +44,7 @@ from services.get_stage_by_id.service import GetStageByIdService
 from services.get_stages_service.service import GetStagesService
 from usecases.change_doc_stage.usecase import ChangeDocumentStageUseCase
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
-from services.notification import (
-    CompositeNotifier,
-    InAppUserNotifier,
-    Notifier,
-    ResendEmailNotifier,
-    WebhookNotifier,
-)
+from services.notification import InAppUserNotifier, Notifier
 from services.user_in_app_notification.service import UserInAppNotificationService
 from usecases.create_in_app_user_notification.usecase import CreateInAppUserNotificationUseCase
 
@@ -173,17 +167,17 @@ class AsyncAppProvider(Provider):
     ) -> AddDocumentService:
         return AddDocumentService(document_repo)
 
-    @provide
-    async def resend_email_notifier(
-        self,
-        notification_settings: NotificationSettings,
-        get_user_service: GetUserService,
-    ) -> ResendEmailNotifier:
-        return ResendEmailNotifier(notification_settings, get_user_service)
+    # @provide
+    # async def resend_email_notifier(
+    #     self,
+    #     notification_settings: NotificationSettings,
+    #     get_user_service: GetUserService,
+    # ) -> ResendEmailNotifier:
+    #     return ResendEmailNotifier(notification_settings, get_user_service)
 
-    @provide
-    async def webhook_notifier(self, notification_settings: NotificationSettings) -> WebhookNotifier:
-        return WebhookNotifier(notification_settings)
+    # @provide
+    # async def webhook_notifier(self, notification_settings: NotificationSettings) -> WebhookNotifier:
+    #     return WebhookNotifier(notification_settings)
 
     @provide
     async def in_app_user_notifier(
@@ -195,11 +189,12 @@ class AsyncAppProvider(Provider):
     @provide
     async def notifier(
         self,
-        resend_email_notifier: ResendEmailNotifier,
-        webhook_notifier: WebhookNotifier,
+        # resend_email_notifier: ResendEmailNotifier,
+        # webhook_notifier: WebhookNotifier,
         in_app_user_notifier: InAppUserNotifier,
     ) -> Notifier:
-        return CompositeNotifier(resend_email_notifier, webhook_notifier, in_app_user_notifier)
+        # return CompositeNotifier(resend_email_notifier, webhook_notifier, in_app_user_notifier)
+        return in_app_user_notifier
 
     @provide
     async def create_document_file_use_case(
@@ -390,9 +385,9 @@ class ConfigProvider(Provider):
     async def http_server_settings(self) -> HTTPServerSettings:
         return HTTPServerSettings(_env_file=_ENV_PATH)
 
-    @provide(scope=Scope.APP)
-    async def notification_settings(self) -> NotificationSettings:
-        return NotificationSettings(_env_file=_ENV_PATH)
+    # @provide(scope=Scope.APP)
+    # async def notification_settings(self) -> NotificationSettings:
+    #     return NotificationSettings(_env_file=_ENV_PATH)
 
 
 container = make_async_container(ConfigProvider(), AsyncAppProvider())
