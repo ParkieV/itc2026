@@ -16,6 +16,20 @@ class AsyncInMemoryUserRepository:
                     "password": "password123",
                     "scope": "user",
                     "fio": "Тестовый Пользователь",
+                },
+                {
+                    "user_id": 2,
+                    "login": "yarik",
+                    "password": "password123",
+                    "scope": "user",
+                    "fio": "Тестовый Пользователь",
+                },
+                {
+                    "user_id": 3,
+                    "login": "timosha",
+                    "password": "password123",
+                    "scope": "user",
+                    "fio": "Тестовый Пользователь",
                 }
             ]
         ).set_index(["user_id", "login"])

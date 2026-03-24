@@ -1,0 +1,14 @@
+name: emk-frontend
+
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    image: itc2026-frontend:local
+    restart: unless-stopped
+    ports:
+      - "80:80"

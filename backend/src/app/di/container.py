@@ -11,14 +11,20 @@ from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
 from services.add_document.service import AddDocumentService
 from services.add_origin_document_file.service import AddOriginDocumentFileService
 from services.authenticate_user.service import AuthenticateUserService
-from services.get_origin_document.service import GetOriginDocumentService
-from services.get_pdf_document.service import GetPdfDocumentService
 from services.save_pdf_document_file.service import SavePdfDocumentFileService
 from services.get_user.service import GetUserService
 from services.issue_access_token import IssueAccessTokenService
 from usecases.authorize_user.usecase import AuthorizeUserUseCase
 from usecases.create_document_file.usecase import CreateDocumentFileUseCase
-
+from services.get_origin_document.service import GetOriginDocumentService
+from services.get_pdf_document.service import GetPdfDocumentService
+from repositories.inmemory_stage_reviewers_repo import AsyncInMemoryStageReviewersRepository
+from repositories.inmemory_stages_repo import AsyncInMemoryStagesRepository
+from services.change_doc_stage.service import ChangeDocumentStageService
+from services.get_stage_by_id.service import GetStageByIdService
+from services.get_stages_service.service import GetStagesService
+from usecases.change_doc_stage.usecase import ChangeDocumentStageUseCase
+from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
 
 _ENV_PATH = os.environ.get("ENV_PATH", None)
 
@@ -46,6 +52,13 @@ class AsyncAppProvider(Provider):
     @provide
     async def document_files_repo(self) -> InMemoryDocumentFilesRepository:
         return InMemoryDocumentFilesRepository()
+
+    async def stages_repo(self) -> AsyncInMemoryStagesRepository:
+        return AsyncInMemoryStagesRepository()
+
+    @provide
+    async def stage_reviewers_repo(self) -> AsyncInMemoryStageReviewersRepository:
+        return AsyncInMemoryStageReviewersRepository()
 
     @provide
     async def authenticate_user_service(self, user_repo: AsyncInMemoryUserRepository) -> AuthenticateUserService:
@@ -120,6 +133,55 @@ class AsyncAppProvider(Provider):
             add_document_service=add_document_service,
             add_origin_document_file_service=add_origin_document_file_service,
             save_pdf_document_file_service=save_pdf_document_file_service,
+        )
+
+    @provide
+    async def change_document_stage_service(
+        self,
+        document_repo: InMemoryDocumentRepository,
+    ) -> ChangeDocumentStageService:
+        return ChangeDocumentStageService(document_repo)
+
+    @provide
+    async def get_stages_service(
+        self,
+        stages_repo: AsyncInMemoryStagesRepository,
+    ) -> GetStagesService:
+        return GetStagesService(stages_repo)
+
+    @provide
+    async def get_stage_by_id_service(
+        self,
+        stages_repo: AsyncInMemoryStagesRepository,
+    ) -> GetStageByIdService:
+        return GetStageByIdService(stages_repo)
+
+    @provide
+    async def get_stages_with_reviewer_and_docs_uc(
+        self,
+        stages_repo: AsyncInMemoryStagesRepository,
+        document_repo: InMemoryDocumentRepository,
+        stage_reviewers_repo: AsyncInMemoryStageReviewersRepository,
+        user_repo: AsyncInMemoryUserRepository,
+    ) -> GetStagesWithReviewerAndDocsUseCase:
+        return GetStagesWithReviewerAndDocsUseCase(
+            stages_repo,
+            document_repo,
+            stage_reviewers_repo,
+            user_repo,
+        )
+
+    @provide
+    async def change_doc_stage_uc(
+        self,
+        get_pdf_document_service: GetPdfDocumentService,
+        change_document_stage_service: ChangeDocumentStageService,
+        get_stage_by_id_service: GetStageByIdService,
+    ) -> ChangeDocumentStageUseCase:
+        return ChangeDocumentStageUseCase(
+            get_pdf_document_service,
+            change_document_stage_service,
+            get_stage_by_id_service,
         )
 
 
