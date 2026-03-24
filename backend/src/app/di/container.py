@@ -174,6 +174,28 @@ class AsyncAppProvider(Provider):
         return GetStageByIdService(stages_repo)
 
     @provide
+    async def change_document_stage_service(
+        self,
+        document_repo: InMemoryDocumentRepository,
+    ) -> ChangeDocumentStageService:
+        return ChangeDocumentStageService(document_repo)
+
+    @provide
+    async def change_doc_stage_uc(
+        self,
+        get_pdf_document_service: GetPdfDocumentService,
+        change_document_stage_service: ChangeDocumentStageService,
+        get_stage_by_id_service: GetStageByIdService,
+        reviews_repo: AsyncInMemoryReviewsRepository,
+    ) -> ChangeDocumentStageUseCase:
+        return ChangeDocumentStageUseCase(
+            get_pdf_document_service,
+            change_document_stage_service,
+            get_stage_by_id_service,
+            reviews_repo,
+        )
+
+    @provide
     async def change_review_view_status_service(
         self,
         reviews_repo: AsyncInMemoryReviewsRepository,

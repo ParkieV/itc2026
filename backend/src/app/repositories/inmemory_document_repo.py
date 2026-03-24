@@ -101,11 +101,11 @@ class InMemoryDocumentRepository:
         patched = Document(
             title=document.title,
             description=document.description,
-            file=document.file,
+            file_id=document.file_id,
             authors=document.authors,
             stage_id=document.stage_id,
             created_at=existing['created_at'],
             modified_at=now_iso_msk(),
-            pdf_file=document.pdf_file,
+            pdf_file_id=document.pdf_file_id,
         )
         self._docs[str(document_id)] = asdict(patched)
