@@ -8,5 +8,4 @@
 POSTGRES_DB=db
 POSTGRES_USER=user
 POSTGRES_PASSWORD=strongpassword
-
 ```
