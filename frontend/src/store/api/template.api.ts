@@ -1,10 +1,10 @@
-import { api } from '@/store/api/api'
+import { api } from '@store/api/api'
 
 export const templateApi = api.injectEndpoints({
 	endpoints: builder => ({
 		getTemplateList: builder.query({
 			query: () => ({ url: '/template', method: 'GET' }),
-			providesTags: ['Cards'],
+			providesTags: ['Documents'],
 		}),
 		postTemplate: builder.mutation({
 			query: (body: { name: string }) => ({
@@ -12,7 +12,7 @@ export const templateApi = api.injectEndpoints({
 				method: 'POST',
 				body,
 			}),
-			invalidatesTags: ['Cards'],
+			invalidatesTags: ['Documents'],
 		}),
 	}),
 })
