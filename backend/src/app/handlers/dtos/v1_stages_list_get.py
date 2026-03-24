@@ -25,9 +25,17 @@ class StageReviewerUserGetResponse(BaseModel):
     fio: str
 
 
+class DocumentGetResponse(BaseModel):
+    title: str
+    description: str
+    authors: list[int]
+    created_at: int
+    modified_at: int
+
+
 class V1StageWithReviewerAndDocsGetResponse(BaseModel):
     stage: StageSummaryGetResponse
-    docs: list[Any] = Field(default_factory=list)
+    docs: list[DocumentGetResponse] = Field(default_factory=list)
     reviewers: list[StageReviewerUserGetResponse] = Field(default_factory=list)
 
 
