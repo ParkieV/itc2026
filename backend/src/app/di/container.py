@@ -53,6 +53,7 @@ class AsyncAppProvider(Provider):
     async def document_files_repo(self) -> InMemoryDocumentFilesRepository:
         return InMemoryDocumentFilesRepository()
 
+    @provide
     async def stages_repo(self) -> AsyncInMemoryStagesRepository:
         return AsyncInMemoryStagesRepository()
 

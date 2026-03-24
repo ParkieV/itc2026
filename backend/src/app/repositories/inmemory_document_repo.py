@@ -59,8 +59,8 @@ class InMemoryDocumentRepository:
         # TODO: ПРОВЕРИТЬ
         self._docs[self._count] = {
           **asdict(document),
-          created_at,
-          modified_at
+          "created_at": created_at,
+          "modified_at": modified_at,
         }
         self._add_count()
 
