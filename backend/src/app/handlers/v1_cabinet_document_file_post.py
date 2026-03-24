@@ -16,7 +16,12 @@ from services.get_origin_document.service import GetOriginDocumentService
 from services.get_origin_document.exceptions import DocumentNotAllowed
 from services.get_origin_document.exceptions import DocumentNotFound
 from services.add_origin_document_file.exceptions import FileExists
-from services.save_pdf_document_file.exceptions import PdfFileExists, PdfConversionFailed
+from services.save_pdf_document_file.exceptions import (
+    OriginFileNotFound,
+    PdfConversionFailed,
+    PdfFileExists,
+    UnsupportedOriginFormat,
+)
 from services.add_origin_document_file.exceptions import InvalidDocumentFormat
 from services.add_document.exceptions import InvalidAuthorId
 
@@ -39,6 +44,7 @@ async def create_cabinet_document_file(
     create_document_file_uc: FromDishka[CreateDocumentFileUseCase],
     get_origin_document_service: FromDishka[GetOriginDocumentService],
     title: str = Form(...),
+    description: str = Form(...),
     authors: list[int] = Form(...),
     file: UploadFile = File(...),
     client_id: str = Depends(get_current_client_id),
@@ -52,11 +58,20 @@ async def create_cabinet_document_file(
         document_id = await create_document_file_uc.execute(
             document=Document(
                 title=title,
+                description=description,
                 authors=normalized_authors,
+                stage_id=0,
             ),
             upload_file=file,
         )
-    except (InvalidDocumentFormat, FileExists, PdfFileExists, PdfConversionFailed) as err:
+    except (
+        InvalidDocumentFormat,
+        FileExists,
+        PdfFileExists,
+        PdfConversionFailed,
+        OriginFileNotFound,
+        UnsupportedOriginFormat,
+    ) as err:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err)) from err
     except (InvalidAuthorId, DocumentNotAllowed) as err:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(err)) from err

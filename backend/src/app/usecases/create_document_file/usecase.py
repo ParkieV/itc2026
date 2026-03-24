@@ -39,7 +39,9 @@ class CreateDocumentFileUseCase:
         return await self._add_document_service.execute(
             Document(
                 title=document.title,
+                description=document.description,
                 authors=document.authors,
+                stage_id=document.stage_id,
                 file_id=file_id,
                 pdf_file_id=pdf_file_id,
             )
