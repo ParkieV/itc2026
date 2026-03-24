@@ -5,9 +5,10 @@ from dataclasses import dataclass
 class Document:
     title: str
     description: str
-    file: str
     authors: list[int]
     stage_id: int
-    created_at: str | None = None
-    modified_at: str | None = None
-    pdf_file: str | None = None
+    file_id: int | None = None
+    pdf_file_id: int | None = None
+    created_at: int | None = None
+    modified_at: int | None = None
+

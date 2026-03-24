@@ -8,12 +8,12 @@ from handlers.dtos.v1_cabinett_document_comments import V1CabinettDocumentCommen
 class V1CabinetDocumentGetDocumentResponse(BaseModel):
     title: str
     description: str
-    file: str
+    file_id: int
     authors: list[int]
     stage_id: int
     created_at: str
     modified_at: str
-    pdf_file: str | None = None
+    pdf_file_id: int | None = None
 
 
 class V1CabinetDocumentGetReviewResponse(BaseModel):

@@ -2,11 +2,17 @@
 name: Deploy backend
 
 on:
+  push:
+    branches: [backend/main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.backend.yml'
   pull_request:
-    types:
-      - closed
-    branches:
-      - backend/main
+    types: [closed]
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.backend.yml'
 
 jobs:
   deploy:
@@ -26,7 +32,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.PROJECT_DIR }}
-            git switch backend/main
-            git pull origin backend/main
+            git fetch --all
+            git checkout main
+            git pull origin main
             docker compose up --build -d
 

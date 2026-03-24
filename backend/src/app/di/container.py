@@ -8,6 +8,18 @@ from repositories.inmemory_comments_repo import AsyncInMemoryCommentsRepository
 from security.jwt_provider import JWTProvider
 from repositories.inmemory_document_repo import InMemoryDocumentRepository
 from repositories.inmemory_reviews_repo import AsyncInMemoryReviewsRepository
+from repositories.inmemory_document_files_repo import InMemoryDocumentFilesRepository
+from security.jwt_provider import JWTProvider
+from repositories.inmemory_document_repo import InMemoryDocumentRepository
+from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
+from services.add_document.service import AddDocumentService
+from services.add_origin_document_file.service import AddOriginDocumentFileService
+from services.authenticate_user.service import AuthenticateUserService
+from services.save_pdf_document_file.service import SavePdfDocumentFileService
+from services.get_user.service import GetUserService
+from services.issue_access_token import IssueAccessTokenService
+from usecases.authorize_user.usecase import AuthorizeUserUseCase
+from usecases.create_document_file.usecase import CreateDocumentFileUseCase
 from services.get_origin_document.service import GetOriginDocumentService
 from services.create_comment.service import CreateCommentService
 from services.patch_comment.service import PatchCommentService
@@ -26,6 +38,10 @@ from services.issue_access_token import IssueAccessTokenService
 from services.setup_reviewer.service import SetupReviewerService
 from usecases.authorize_user.usecase import AuthorizeUserUseCase
 from usecases.get_document_detail.usecase import GetDocumentDetailUseCase
+from services.change_doc_stage.service import ChangeDocumentStageService
+from services.get_stage_by_id.service import GetStageByIdService
+from services.get_stages_service.service import GetStagesService
+from usecases.change_doc_stage.usecase import ChangeDocumentStageUseCase
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
 
 
@@ -51,6 +67,10 @@ class AsyncAppProvider(Provider):
     @provide
     async def document_repo(self) -> InMemoryDocumentRepository:
         return InMemoryDocumentRepository()
+
+    @provide
+    async def document_files_repo(self) -> InMemoryDocumentFilesRepository:
+        return InMemoryDocumentFilesRepository()
 
     @provide
     async def stages_repo(self) -> AsyncInMemoryStagesRepository:
@@ -91,15 +111,53 @@ class AsyncAppProvider(Provider):
     async def get_pdf_document_service(
         self,
         document_repo: InMemoryDocumentRepository,
+        document_files_repo: InMemoryDocumentFilesRepository,
     ) -> GetPdfDocumentService:
-        return GetPdfDocumentService(document_repo)
+        return GetPdfDocumentService(document_repo, document_files_repo)
 
     @provide
     async def get_origin_document_service(
             self,
             document_repo: InMemoryDocumentRepository,
+            document_files_repo: InMemoryDocumentFilesRepository,
     ) -> GetOriginDocumentService:
-        return GetOriginDocumentService(document_repo)
+        return GetOriginDocumentService(document_repo, document_files_repo)
+
+    @provide
+    async def add_origin_document_file_service(
+        self,
+        document_files_repo: InMemoryDocumentFilesRepository,
+    ) -> AddOriginDocumentFileService:
+        return AddOriginDocumentFileService(document_files_repo)
+
+    @provide
+    async def save_pdf_document_file_service(
+        self,
+        document_files_repo: InMemoryDocumentFilesRepository,
+    ) -> SavePdfDocumentFileService:
+        return SavePdfDocumentFileService(document_files_repo)
+
+    @provide
+    async def add_document_service(
+        self,
+        document_repo: InMemoryDocumentRepository,
+    ) -> AddDocumentService:
+        return AddDocumentService(document_repo)
+
+    @provide
+    async def create_document_file_use_case(
+        self,
+        get_user_service: GetUserService,
+        add_document_service: AddDocumentService,
+        add_origin_document_file_service: AddOriginDocumentFileService,
+        save_pdf_document_file_service: SavePdfDocumentFileService,
+    ) -> CreateDocumentFileUseCase:
+        return CreateDocumentFileUseCase(
+            get_user_service=get_user_service,
+            add_document_service=add_document_service,
+            add_origin_document_file_service=add_origin_document_file_service,
+            save_pdf_document_file_service=save_pdf_document_file_service,
+        )
 
     @provide
     async def get_stages_service(

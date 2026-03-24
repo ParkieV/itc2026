@@ -44,12 +44,12 @@ async def cabinet_document_get(
         document=V1CabinetDocumentGetDocumentResponse(
             title=detail.document.title,
             description=detail.document.description,
-            file=detail.document.file,
+            file_id=detail.document.file_id,
             authors=detail.document.authors,
             stage_id=detail.document.stage_id,
             created_at=detail.document.created_at or "",
             modified_at=detail.document.modified_at or "",
-            pdf_file=detail.document.pdf_file,
+            pdf_file_id=detail.document.pdf_file_id,
         ),
         reviews=[
             V1CabinetDocumentGetReviewResponse(
