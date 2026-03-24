@@ -16,8 +16,8 @@ class InMemoryDocumentRepository:
             '1': {
                 "title": "test",
                 "description": "test description 1",
-                "file": "test",
-                "pdf_file": "test",
+                "file_id": 1,
+                "pdf_file_id": 1,
                 "authors": [1],
                 "stage_id": 1,
                 "created_at": now_ts,
@@ -26,8 +26,8 @@ class InMemoryDocumentRepository:
             '2': {
                 "title": "test",
                 "description": "test description 2",
-                "file": "test",
-                "pdf_file": "test",
+                "file_id": 1,
+                "pdf_file_id": 1,
                 "authors": [1],
                 "stage_id": 2,
                 "created_at": now_ts,
@@ -36,8 +36,8 @@ class InMemoryDocumentRepository:
             '3': {
                 "title": "test",
                 "description": "test description 3",
-                "file": "test",
-                "pdf_file": "test",
+                "file_id": 1,
+                "pdf_file_id": 1,
                 "authors": [2],
                 "stage_id": 2,
                 "created_at": now_ts,
@@ -49,20 +49,19 @@ class InMemoryDocumentRepository:
     def _add_count(self) -> None:
         self._count += 1
 
+    def get_next_document_id(self) -> int:
+        return self._count
+
     def add_document(self, document: Document) -> None:
         created_at = document.created_at or self._now_msk_timestamp()
         modified_at = document.modified_at or created_at
-        document_to_store = Document(
-            title=document.title,
-            description=document.description,
-            file=document.file,
-            authors=document.authors,
-            stage_id=document.stage_id,
-            created_at=created_at,
-            modified_at=modified_at,
-            pdf_file=document.pdf_file,
-        )
-        self._docs[self._count] = asdict(document_to_store)
+
+        # TODO: ПРОВЕРИТЬ
+        self._docs[self._count] = {
+          **asdict(document),
+          created_at,
+          modified_at
+        }
         self._add_count()
 
     def get_document(self, document_id: int) -> Document | None:
@@ -74,8 +73,8 @@ class InMemoryDocumentRepository:
         return Document(
             title=document_model['title'],
             description=document_model['description'],
-            file=document_model['file'],
-            pdf_file=document_model['pdf_file'],
+            file_id=document_model['file_id'],
+            pdf_file_id=document_model.get('pdf_file_id'),
             authors=document_model['authors'],
             stage_id=document_model['stage_id'],
             created_at=document_model['created_at'],

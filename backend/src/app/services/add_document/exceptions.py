@@ -1,0 +1,2 @@
+class InvalidAuthorId(Exception):
+    pass
