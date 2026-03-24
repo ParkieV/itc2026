@@ -1,6 +1,9 @@
+from dataclasses import replace
+
 import pandas as pd
 
 from entities.comment import Comment
+from entities.comment_status import CommentStatus
 
 
 class AsyncInMemoryCommentsRepository:
@@ -8,73 +11,135 @@ class AsyncInMemoryCommentsRepository:
         self._rows = pd.DataFrame(
             [
                 {
+                    "comment_id": 1,
                     "doc_id": 1,
                     "stage_id": 1,
                     "user_id": 1,
+                    "reply_to": pd.NA,
                     "subject": "Initial review",
                     "content": "Please fix formatting and naming.",
+                    "xfdf": "",
+                    "status": pd.NA,
+                    "is_viewed": False,
                     "created_at": 1710000000,
                 },
                 {
+                    "comment_id": 2,
                     "doc_id": 1,
                     "stage_id": 1,
                     "user_id": 2,
+                    "reply_to": 1,
                     "subject": "LGTM",
                     "content": "No additional comments.",
+                    "xfdf": "",
+                    "status": pd.NA,
+                    "is_viewed": False,
                     "created_at": 1710003600,
                 },
                 {
+                    "comment_id": 3,
                     "doc_id": 2,
                     "stage_id": 2,
                     "user_id": 1,
+                    "reply_to": pd.NA,
                     "subject": "Needs tests",
                     "content": "Please add integration tests.",
+                    "xfdf": "",
+                    "status": pd.NA,
+                    "is_viewed": False,
                     "created_at": 1710007200,
                 },
             ]
         )
+        self._next_id = int(self._rows["comment_id"].max()) + 1
 
     @property
     def rows(self) -> pd.DataFrame:
         return self._rows.copy()
 
-    async def add(self, comment: Comment) -> None:
+    @staticmethod
+    def _reply_to_value(v) -> int | None:
+        if v is None or pd.isna(v):
+            return None
+        return int(v)
+
+    @staticmethod
+    def _status_value(v) -> CommentStatus | None:
+        if v is None or pd.isna(v):
+            return None
+        s = str(v).strip()
+        if not s:
+            return None
+        return CommentStatus(s)
+
+    def _series_to_comment(self, row: pd.Series) -> Comment:
+        return Comment(
+            comment_id=int(row["comment_id"]),
+            doc_id=int(row["doc_id"]),
+            stage_id=int(row["stage_id"]),
+            user_id=int(row["user_id"]),
+            subject=str(row["subject"]),
+            content=str(row["content"]),
+            xfdf=str(row["xfdf"]),
+            created_at=int(row["created_at"]),
+            reply_to=self._reply_to_value(row["reply_to"]),
+            status=self._status_value(row["status"]),
+            is_viewed=bool(row["is_viewed"]),
+        )
+
+    async def add(self, comment: Comment) -> Comment:
+        new_id = self._next_id
+        self._next_id += 1
+        stored = replace(comment, comment_id=new_id)
         self._rows.loc[len(self._rows)] = {
-            "doc_id": comment.doc_id,
-            "stage_id": comment.stage_id,
-            "user_id": comment.user_id,
-            "subject": comment.subject,
-            "content": comment.content,
-            "created_at": comment.created_at,
+            "comment_id": stored.comment_id,
+            "doc_id": stored.doc_id,
+            "stage_id": stored.stage_id,
+            "user_id": stored.user_id,
+            "reply_to": pd.NA if stored.reply_to is None else stored.reply_to,
+            "subject": stored.subject,
+            "content": stored.content,
+            "xfdf": stored.xfdf,
+            "status": pd.NA if stored.status is None else stored.status.value,
+            "is_viewed": stored.is_viewed,
+            "created_at": stored.created_at,
         }
+        return stored
+
+    async def get_by_doc_and_comment_id(self, doc_id: int, comment_id: int) -> Comment | None:
+        filtered = self.rows[
+            (self.rows["doc_id"] == doc_id) & (self.rows["comment_id"] == comment_id)
+        ]
+        if filtered.empty:
+            return None
+        return self._series_to_comment(filtered.iloc[0])
 
     async def get_by_doc_and_stage_id(self, doc_id: int, stage_id: int) -> list[Comment]:
         filtered = self.rows[
             (self.rows["doc_id"] == doc_id)
             & (self.rows["stage_id"] == stage_id)
         ]
-        return [
-            Comment(
-                doc_id=int(row["doc_id"]),
-                stage_id=int(row["stage_id"]),
-                user_id=int(row["user_id"]),
-                subject=str(row["subject"]),
-                content=str(row["content"]),
-                created_at=int(row["created_at"]),
-            )
-            for _, row in filtered.iterrows()
-        ]
+        return [self._series_to_comment(filtered.loc[idx]) for idx in filtered.index]
 
     async def get_by_doc_id(self, doc_id: int) -> list[Comment]:
         filtered = self.rows[self.rows["doc_id"] == doc_id]
-        return [
-            Comment(
-                doc_id=int(row["doc_id"]),
-                stage_id=int(row["stage_id"]),
-                user_id=int(row["user_id"]),
-                subject=str(row["subject"]),
-                content=str(row["content"]),
-                created_at=int(row["created_at"]),
-            )
-            for _, row in filtered.iterrows()
-        ]
+        return [self._series_to_comment(filtered.loc[idx]) for idx in filtered.index]
+
+    async def update_is_viewed_and_status(
+        self,
+        doc_id: int,
+        comment_id: int,
+        *,
+        is_viewed: bool | None = None,
+        status: CommentStatus | None = None,
+    ) -> Comment | None:
+        mask = (self._rows["doc_id"] == doc_id) & (self._rows["comment_id"] == comment_id)
+        matching = self._rows.index[mask]
+        if len(matching) == 0:
+            return None
+        idx = matching[0]
+        if is_viewed is not None:
+            self._rows.at[idx, "is_viewed"] = is_viewed
+        if status is not None:
+            self._rows.at[idx, "status"] = status.value
+        return self._series_to_comment(self._rows.loc[idx])

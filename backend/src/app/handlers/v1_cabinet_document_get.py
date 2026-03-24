@@ -63,11 +63,16 @@ async def cabinet_document_get(
         ],
         comments=[
             V1CabinettDocumentCommentResponse(
+                comment_id=c.comment_id,
                 doc_id=c.doc_id,
                 stage_id=c.stage_id,
                 user_id=c.user_id,
+                reply_to=c.reply_to,
                 subject=c.subject,
                 content=c.content,
+                xfdf=c.xfdf,
+                status=c.status,
+                is_viewed=c.is_viewed,
                 created_at=str(c.created_at),
             )
             for c in detail.comments

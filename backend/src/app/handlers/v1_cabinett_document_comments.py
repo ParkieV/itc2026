@@ -3,6 +3,7 @@ from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from handlers.dependencies.get_current_client_id import get_current_client_id
+from services.comment_exceptions import CommentNotFound
 from services.create_comment.service import CreateCommentService
 from services.get_comments_by_doc.service import GetCommentsByDocService
 from services.get_comments_by_doc_and_stage.service import GetCommentsByDocAndStageService
@@ -20,6 +21,22 @@ from .dtos.v1_cabinett_document_comments import (
 )
 
 router = APIRouter()
+
+
+def _comment_to_response(i) -> V1CabinettDocumentCommentResponse:
+    return V1CabinettDocumentCommentResponse(
+        comment_id=i.comment_id,
+        doc_id=i.doc_id,
+        stage_id=i.stage_id,
+        user_id=i.user_id,
+        reply_to=i.reply_to,
+        subject=i.subject,
+        content=i.content,
+        xfdf=i.xfdf,
+        status=i.status,
+        is_viewed=i.is_viewed,
+        created_at=str(i.created_at),
+    )
 
 
 @router.post(
@@ -46,8 +63,10 @@ async def create_document_comment(
             user_id=int(user_id),
             subject=request.subject,
             content=request.content,
+            xfdf=request.xfdf,
+            reply_to=request.reply_to,
         )
-    except (DocumentNotFound, StageNotFound, UserNotFound) as err_not_found:
+    except (DocumentNotFound, StageNotFound, UserNotFound, CommentNotFound) as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
 
 
@@ -73,17 +92,7 @@ async def get_document_comments(
     except (DocumentNotFound, StageNotFound) as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
 
-    return [
-        V1CabinettDocumentCommentResponse(
-            doc_id=i.doc_id,
-            stage_id=i.stage_id,
-            user_id=i.user_id,
-            subject=i.subject,
-            content=i.content,
-            created_at=str(i.created_at),
-        )
-        for i in comments
-    ]
+    return [_comment_to_response(i) for i in comments]
 
 
 @router.get(
@@ -107,14 +116,4 @@ async def get_document_comments_all(
     except (DocumentNotFound, StageNotFound) as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
 
-    return [
-        V1CabinettDocumentCommentResponse(
-            doc_id=i.doc_id,
-            stage_id=i.stage_id,
-            user_id=i.user_id,
-            subject=i.subject,
-            content=i.content,
-            created_at=str(i.created_at),
-        )
-        for i in comments
-    ]
+    return [_comment_to_response(i) for i in comments]

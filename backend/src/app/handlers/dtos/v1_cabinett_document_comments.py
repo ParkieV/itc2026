@@ -1,12 +1,19 @@
 from pydantic import BaseModel, Field, RootModel
 
+from entities.comment_status import CommentStatus
+
 
 class V1CabinettDocumentCommentResponse(BaseModel):
+    comment_id: int
     doc_id: int
     stage_id: int
     user_id: int
+    reply_to: int | None = None
     subject: str
     content: str
+    xfdf: str
+    status: CommentStatus | None = None
+    is_viewed: bool = False
     created_at: str
 
 
@@ -14,6 +21,8 @@ class V1CabinettDocumentCreateCommentRequest(BaseModel):
     stage_id: int
     subject: str
     content: str
+    xfdf: str
+    reply_to: int | None = None
 
 
 class V1_CABINETT_DOCUMENT_COMMENTS_POST_RESPONSE200(BaseModel):

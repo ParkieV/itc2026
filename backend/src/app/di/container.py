@@ -10,6 +10,7 @@ from repositories.inmemory_document_repo import InMemoryDocumentRepository
 from repositories.inmemory_reviews_repo import AsyncInMemoryReviewsRepository
 from services.get_origin_document.service import GetOriginDocumentService
 from services.create_comment.service import CreateCommentService
+from services.patch_comment.service import PatchCommentService
 from services.get_comments_by_doc.service import GetCommentsByDocService
 from services.get_comments_by_doc_and_stage.service import GetCommentsByDocAndStageService
 from services.get_pdf_document.service import GetPdfDocumentService
@@ -199,6 +200,14 @@ class AsyncAppProvider(Provider):
             get_stage_by_id_service,
             get_user_service,
         )
+
+    @provide
+    async def patch_comment_service(
+        self,
+        comments_repo: AsyncInMemoryCommentsRepository,
+        get_pdf_document_service: GetPdfDocumentService,
+    ) -> PatchCommentService:
+        return PatchCommentService(comments_repo, get_pdf_document_service)
 
     @provide
     async def get_document_detail_uc(
