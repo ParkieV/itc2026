@@ -60,7 +60,7 @@ async def create_cabinet_document_file(
                 title=title,
                 description=description,
                 authors=normalized_authors,
-                stage_id=0,
+                stage_id=1,
             ),
             upload_file=file,
         )
