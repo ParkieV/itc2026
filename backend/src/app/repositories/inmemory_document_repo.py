@@ -8,9 +8,9 @@ class InMemoryDocumentRepository:
         self._docs = {
             '1': {
                 "title": "test",
-                "file": "test",
-                "pdf_file": "test",
-                "authors": [1]
+                "authors": [1],
+                "file_id": 1,
+                "pdf_file_id": 1,
             }
         }
         self._count = 2
@@ -18,8 +18,11 @@ class InMemoryDocumentRepository:
     def _add_count(self) -> None:
         self._count += 1
 
+    def get_next_document_id(self) -> int:
+        return self._count
+
     def add_document(self, document: Document) -> None:
-        self._docs[self._count] = asdict(document)
+        self._docs[str(self._count)] = asdict(document)
         self._add_count()
 
     def get_document(self, document_id: int) -> Document | None:
@@ -30,9 +33,9 @@ class InMemoryDocumentRepository:
 
         return Document(
             title=document_model['title'],
-            file=document_model['file'],
-            pdf_file=document_model['pdf_file'],
             authors=document_model['authors'],
+            file_id=document_model['file_id'],
+            pdf_file_id=document_model.get('pdf_file_id'),
         )
 
     def patch_document(self, document: Document, document_id: int) -> str:
