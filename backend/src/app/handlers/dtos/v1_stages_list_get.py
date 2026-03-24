@@ -29,8 +29,8 @@ class DocumentGetResponse(BaseModel):
     title: str
     description: str
     authors: list[int]
-    created_at: int
-    modified_at: int
+    created_at: str
+    modified_at: str
 
 
 class V1StageWithReviewerAndDocsGetResponse(BaseModel):

@@ -42,8 +42,8 @@ async def list_stages(
                     title=d.title,
                     description=d.description,
                     authors=d.authors,
-                    created_at=d.created_at,
-                    modified_at=d.modified_at,
+                    created_at=d.created_at or "",
+                    modified_at=d.modified_at or "",
                 )
                 for d in row.docs
             ],
