@@ -1,5 +1,5 @@
-import en from '@/translations/en.json';
-import ru from '@/translations/ru.json';
+import en from '@translations/en.json';
+import ru from '@translations/ru.json';
 import cookie from 'js-cookie';
 
 const translations = { en, ru } as const;

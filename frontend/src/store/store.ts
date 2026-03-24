@@ -1,12 +1,13 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
-import { reducer as authReducer } from '@/store/auth/auth.slice.ts'
+import { reducer as authReducer } from '@store/auth/auth.slice.ts'
 
 
-import { api } from '@/store/api/api'
-import '@/store/api/auth.api'
-import '@/store/api/user.api'
-import '@/store/api/template.api'
+import { api } from '@store/api/api'
+import '@store/api/auth.api'
+import '@store/api/user.api'
+import '@store/api/template.api'
+import '@store/api/comments.api'
 
 const reducers = combineReducers({
 	auth: authReducer,

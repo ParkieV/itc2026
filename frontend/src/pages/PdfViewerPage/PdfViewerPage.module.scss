@@ -1,0 +1,127 @@
+.layout {
+	position: fixed;
+	inset: 0;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background: #f5f5f5;
+}
+
+.viewer {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.panel {
+	background: #fff;
+	border-left: 1px solid #e8e8e8;
+	padding: 16px;
+	overflow: auto;
+}
+
+.heading {
+	font-size: 20px;
+	font-weight: 600;
+	margin: 0 0 12px;
+}
+
+.sub {
+	color: #666;
+	font-size: 13px;
+	margin: 0 0 16px;
+}
+
+.sectionTitle {
+	font-size: 14px;
+	font-weight: 600;
+	margin: 16px 0 8px;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.input,
+.textarea {
+	width: 100%;
+	border: 1px solid #d6d6d6;
+	border-radius: 8px;
+	padding: 8px 10px;
+	font-size: 14px;
+}
+
+.textarea {
+	min-height: 82px;
+	resize: vertical;
+}
+
+.button {
+	border: none;
+	border-radius: 8px;
+	background: #1d4ed8;
+	color: #fff;
+	padding: 9px 12px;
+	cursor: pointer;
+	font-size: 14px;
+	margin-top: 8px;
+}
+
+.button:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.item {
+	border: 1px solid #e4e4e4;
+	border-radius: 10px;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.text {
+	margin: 0;
+	font-size: 13px;
+	color: #444;
+}
+
+.comment {
+	margin: 0;
+	font-size: 14px;
+}
+
+.row {
+	display: flex;
+	gap: 8px;
+}
+
+.small {
+	border: 1px solid #d6d6d6;
+	background: #fff;
+	border-radius: 6px;
+	padding: 6px 8px;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.primary {
+	background: #0f766e;
+	color: #fff;
+	border-color: #0f766e;
+}
+

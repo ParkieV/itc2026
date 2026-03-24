@@ -1,6 +1,6 @@
-import { api } from '@/store/api/api'
-import { actions } from '@/store/auth/auth.slice'
-import type { AuthRequest, AuthResponse } from '@/types/api'
+import { api } from '@store/api/api'
+import { actions } from '@store/auth/auth.slice'
+import type { AuthRequest, AuthResponse } from '@shared/types/api'
 
 export const authApi = api.injectEndpoints({
 	endpoints: builder => ({
