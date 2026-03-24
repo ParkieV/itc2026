@@ -35,4 +35,5 @@ class GetOriginDocumentService:
             pdf_file_id=document.pdf_file_id,
             created_at=document.created_at,
             modified_at=document.modified_at,
+            doc_id=document_id,
         )

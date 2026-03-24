@@ -26,6 +26,7 @@ class StageReviewerUserGetResponse(BaseModel):
 
 
 class DocumentGetResponse(BaseModel):
+    doc_id: int
     title: str
     description: str
     authors: list[int]
