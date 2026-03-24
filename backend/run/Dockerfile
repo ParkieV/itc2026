@@ -48,6 +48,8 @@ LABEL org.opencontainers.image.title="itc2026-server" \
 
 RUN useradd -u 10001 -m appuser
 
+COPY --from=builder /run/private_key.pem /home/run/private_key.pem
+COPY --from=builder /run/public_key.pem /home/run/public_key.pem
 COPY --from=builder /build/src/app /home/app
 COPY --from=builder /opt/venv/bin /opt/venv/bin
 COPY --from=builder /opt/venv/lib/python3.12/site-packages/ /opt/venv/lib
