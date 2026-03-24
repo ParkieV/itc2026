@@ -11,7 +11,7 @@ class V1_CHANGE_DOC_STAGE_POST_RESPONSE200(BaseModel):
 
 
 class V1_CHANGE_DOC_STAGE_POST_RESPONSE400(BaseModel):
-    """Целевая стадия указана некорректно (например, совпадает с текущей)."""
+    """Некорректный переход: не тот next_stage, совпадение этапа, отклонение ревью или не все ACCEPTED."""
 
     detail: str = Field(description="Текст ошибки")
 
