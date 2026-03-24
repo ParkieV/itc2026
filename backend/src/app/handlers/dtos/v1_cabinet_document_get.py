@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+from entities.document_user_status import DocumentUserStatus
 from entities.review_status import ReviewStatus
 
 from handlers.dtos.v1_cabinett_document_comments import V1CabinettDocumentCommentResponse
@@ -14,6 +15,10 @@ class V1CabinetDocumentGetDocumentResponse(BaseModel):
     created_at: str
     modified_at: str
     pdf_file_id: int | None = None
+    status: DocumentUserStatus | None = Field(
+        default=None,
+        description="Статус документа для текущего пользователя (автор или ревьюер); иначе null.",
+    )
 
 
 class V1CabinetDocumentGetReviewResponse(BaseModel):
