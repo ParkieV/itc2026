@@ -28,7 +28,11 @@ class GetOriginDocumentService:
 
         return Document(
             title=document.title,
+            description=document.description,
             authors=document.authors,
+            stage_id=document.stage_id,
             file_id=document.file_id,
             pdf_file_id=document.pdf_file_id,
+            created_at=document.created_at,
+            modified_at=document.modified_at,
         )
