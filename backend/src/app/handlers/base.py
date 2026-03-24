@@ -11,6 +11,9 @@ from .v1_cabinet_document_pdf_file_get import router as v1_cabinet_document_pdf_
 from .v1_cabinet_reviews_post import router as v1_cabinet_reviews_post_router
 from .v1_cabinet_document_file_post import router as v1_cabinet_document_file_post_router
 from .v1_stages_list_get import router as v1_stages_get_router
+from .v1_user_notifications_post import router as v1_user_notifications_post_router
+from .v1_cabinet_notifications_unread_get import router as v1_cabinet_notifications_unread_get_router
+from .v1_cabinet_notification_read_post import router as v1_cabinet_notification_read_post_router
 
 router = APIRouter()
 
@@ -25,3 +28,6 @@ router.include_router(v1_cabinet_document_get_router)
 router.include_router(v1_cabinet_reviews_post_router)
 router.include_router(v1_cabinet_document_file_post_router)
 router.include_router(v1_stages_get_router)
+router.include_router(v1_user_notifications_post_router)
+router.include_router(v1_cabinet_notifications_unread_get_router)
+router.include_router(v1_cabinet_notification_read_post_router)

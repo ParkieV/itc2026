@@ -8,3 +8,4 @@ class User:
     password: str
     scope: str
     fio: str
+    email: str

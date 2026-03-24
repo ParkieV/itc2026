@@ -26,6 +26,7 @@ from services.patch_comment.service import PatchCommentService
 from services.get_comments_by_doc.service import GetCommentsByDocService
 from services.get_comments_by_doc_and_stage.service import GetCommentsByDocAndStageService
 from services.get_pdf_document.service import GetPdfDocumentService
+from repositories.inmemory_user_notifications_repo import InMemoryUserNotificationsRepository
 from repositories.inmemory_stages_repo import AsyncInMemoryStagesRepository
 from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
 from services.authenticate_user.service import AuthenticateUserService
@@ -43,6 +44,9 @@ from services.get_stage_by_id.service import GetStageByIdService
 from services.get_stages_service.service import GetStagesService
 from usecases.change_doc_stage.usecase import ChangeDocumentStageUseCase
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
+from services.notification import InAppUserNotifier, Notifier
+from services.user_in_app_notification.service import UserInAppNotificationService
+from usecases.create_in_app_user_notification.usecase import CreateInAppUserNotificationUseCase
 
 
 _ENV_PATH = os.environ.get("ENV_PATH")
@@ -83,6 +87,25 @@ class AsyncAppProvider(Provider):
     @provide
     async def comments_repo(self) -> AsyncInMemoryCommentsRepository:
         return AsyncInMemoryCommentsRepository()
+
+    @provide
+    async def user_notifications_repo(self) -> InMemoryUserNotificationsRepository:
+        return InMemoryUserNotificationsRepository()
+
+    @provide
+    async def user_in_app_notification_service(
+        self,
+        user_notifications_repo: InMemoryUserNotificationsRepository,
+        get_user_service: GetUserService,
+    ) -> UserInAppNotificationService:
+        return UserInAppNotificationService(user_notifications_repo, get_user_service)
+
+    @provide
+    async def create_in_app_user_notification_uc(
+        self,
+        user_in_app_notification_service: UserInAppNotificationService,
+    ) -> CreateInAppUserNotificationUseCase:
+        return CreateInAppUserNotificationUseCase(user_in_app_notification_service)
 
     @provide
     async def authenticate_user_service(self, user_repo: AsyncInMemoryUserRepository) -> AuthenticateUserService:
@@ -144,6 +167,35 @@ class AsyncAppProvider(Provider):
     ) -> AddDocumentService:
         return AddDocumentService(document_repo)
 
+    # @provide
+    # async def resend_email_notifier(
+    #     self,
+    #     notification_settings: NotificationSettings,
+    #     get_user_service: GetUserService,
+    # ) -> ResendEmailNotifier:
+    #     return ResendEmailNotifier(notification_settings, get_user_service)
+
+    # @provide
+    # async def webhook_notifier(self, notification_settings: NotificationSettings) -> WebhookNotifier:
+    #     return WebhookNotifier(notification_settings)
+
+    @provide
+    async def in_app_user_notifier(
+        self,
+        user_notifications_repo: InMemoryUserNotificationsRepository,
+    ) -> InAppUserNotifier:
+        return InAppUserNotifier(user_notifications_repo)
+
+    @provide
+    async def notifier(
+        self,
+        # resend_email_notifier: ResendEmailNotifier,
+        # webhook_notifier: WebhookNotifier,
+        in_app_user_notifier: InAppUserNotifier,
+    ) -> Notifier:
+        # return CompositeNotifier(resend_email_notifier, webhook_notifier, in_app_user_notifier)
+        return in_app_user_notifier
+
     @provide
     async def create_document_file_use_case(
         self,
@@ -151,12 +203,14 @@ class AsyncAppProvider(Provider):
         add_document_service: AddDocumentService,
         add_origin_document_file_service: AddOriginDocumentFileService,
         save_pdf_document_file_service: SavePdfDocumentFileService,
+        notifier: Notifier,
     ) -> CreateDocumentFileUseCase:
         return CreateDocumentFileUseCase(
             get_user_service=get_user_service,
             add_document_service=add_document_service,
             add_origin_document_file_service=add_origin_document_file_service,
             save_pdf_document_file_service=save_pdf_document_file_service,
+            notifier=notifier,
         )
 
     @provide
@@ -330,6 +384,10 @@ class ConfigProvider(Provider):
     @provide(scope=Scope.APP)
     async def http_server_settings(self) -> HTTPServerSettings:
         return HTTPServerSettings(_env_file=_ENV_PATH)
+
+    # @provide(scope=Scope.APP)
+    # async def notification_settings(self) -> NotificationSettings:
+    #     return NotificationSettings(_env_file=_ENV_PATH)
 
 
 container = make_async_container(ConfigProvider(), AsyncAppProvider())
