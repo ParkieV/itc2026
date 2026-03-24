@@ -15,7 +15,7 @@ from .dtos.v1_cabinet_document_get import (
     V1CabinetDocumentGetReviewResponse,
     V1CabinetDocumentGetResponse,
 )
-from .dtos.v1_cabinett_document_comments import V1CabinettDocumentCommentResponse
+from .dtos.v1_cabinet_document_get import V1CabinetDocumentGetResponse
 
 router = APIRouter()
 
@@ -67,7 +67,7 @@ async def cabinet_document_get(
             for i in detail.reviews
         ],
         comments=[
-            V1CabinettDocumentCommentResponse(
+            V1CabinetDocumentGetResponse(
                 comment_id=c.comment_id,
                 doc_id=c.doc_id,
                 stage_id=c.stage_id,
