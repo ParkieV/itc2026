@@ -2,11 +2,17 @@
 name: Deploy backend
 
 on:
+  push:
+    branches: [backend/main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.backend.yml'
   pull_request:
-    types:
-      - closed
-    branches:
-      - backend/main
+    types: [closed]
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.backend.yml'
 
 jobs:
   deploy:
