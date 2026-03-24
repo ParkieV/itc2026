@@ -12,7 +12,7 @@ class Comment:
     subject: str
     content: str
     xfdf: str
-    created_at: int
+    created_at: str
     reply_to: int | None = None
     status: CommentStatus | None = None
     is_viewed: bool = False

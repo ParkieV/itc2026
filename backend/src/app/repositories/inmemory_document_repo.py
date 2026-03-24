@@ -1,17 +1,12 @@
 from dataclasses import asdict
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from entities import Document
+from utils.datetime_iso import now_iso_msk
 
 
 class InMemoryDocumentRepository:
-    @staticmethod
-    def _now_msk_timestamp() -> int:
-        return int(datetime.now(ZoneInfo("Europe/Moscow")).timestamp())
-
     def __init__(self) -> None:
-        now_ts = self._now_msk_timestamp()
+        now_iso = now_iso_msk()
         self._docs = {
             '1': {
                 "title": "test",
@@ -20,8 +15,8 @@ class InMemoryDocumentRepository:
                 "pdf_file": "test",
                 "authors": [1],
                 "stage_id": 1,
-                "created_at": now_ts,
-                "modified_at": now_ts,
+                "created_at": now_iso,
+                "modified_at": now_iso,
             },
             '2': {
                 "title": "test",
@@ -30,8 +25,8 @@ class InMemoryDocumentRepository:
                 "pdf_file": "test",
                 "authors": [1],
                 "stage_id": 2,
-                "created_at": now_ts,
-                "modified_at": now_ts,
+                "created_at": now_iso,
+                "modified_at": now_iso,
             },
             '3': {
                 "title": "test",
@@ -40,8 +35,8 @@ class InMemoryDocumentRepository:
                 "pdf_file": "test",
                 "authors": [2],
                 "stage_id": 2,
-                "created_at": now_ts,
-                "modified_at": now_ts,
+                "created_at": now_iso,
+                "modified_at": now_iso,
             },
         }
         self._count = 2
@@ -50,7 +45,7 @@ class InMemoryDocumentRepository:
         self._count += 1
 
     def add_document(self, document: Document) -> None:
-        created_at = document.created_at or self._now_msk_timestamp()
+        created_at = document.created_at or now_iso_msk()
         modified_at = document.modified_at or created_at
         document_to_store = Document(
             title=document.title,
@@ -111,7 +106,7 @@ class InMemoryDocumentRepository:
             authors=document.authors,
             stage_id=document.stage_id,
             created_at=existing['created_at'],
-            modified_at=self._now_msk_timestamp(),
+            modified_at=now_iso_msk(),
             pdf_file=document.pdf_file,
         )
         self._docs[str(document_id)] = asdict(patched)

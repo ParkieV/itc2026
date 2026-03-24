@@ -4,6 +4,7 @@ import pandas as pd
 
 from entities.comment import Comment
 from entities.comment_status import CommentStatus
+from utils.datetime_iso import from_unix_seconds_iso_msk
 
 
 class AsyncInMemoryCommentsRepository:
@@ -21,7 +22,7 @@ class AsyncInMemoryCommentsRepository:
                     "xfdf": "",
                     "status": pd.NA,
                     "is_viewed": False,
-                    "created_at": 1710000000,
+                    "created_at": from_unix_seconds_iso_msk(1710000000),
                 },
                 {
                     "comment_id": 2,
@@ -34,7 +35,7 @@ class AsyncInMemoryCommentsRepository:
                     "xfdf": "",
                     "status": pd.NA,
                     "is_viewed": False,
-                    "created_at": 1710003600,
+                    "created_at": from_unix_seconds_iso_msk(1710003600),
                 },
                 {
                     "comment_id": 3,
@@ -47,7 +48,7 @@ class AsyncInMemoryCommentsRepository:
                     "xfdf": "",
                     "status": pd.NA,
                     "is_viewed": False,
-                    "created_at": 1710007200,
+                    "created_at": from_unix_seconds_iso_msk(1710007200),
                 },
             ]
         )
@@ -81,7 +82,7 @@ class AsyncInMemoryCommentsRepository:
             subject=str(row["subject"]),
             content=str(row["content"]),
             xfdf=str(row["xfdf"]),
-            created_at=int(row["created_at"]),
+            created_at=str(row["created_at"]),
             reply_to=self._reply_to_value(row["reply_to"]),
             status=self._status_value(row["status"]),
             is_viewed=bool(row["is_viewed"]),

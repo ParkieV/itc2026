@@ -12,4 +12,4 @@ class IssueAccessTokenService:
             scope=scope,
             exp=expires,
         )
-        return AccessToken(token, expires, scope)
+        return AccessToken(token, expires.isoformat(), scope)

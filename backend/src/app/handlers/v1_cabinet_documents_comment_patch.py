@@ -30,7 +30,7 @@ def _comment_to_response(c) -> V1CabinettDocumentCommentResponse:
         xfdf=c.xfdf,
         status=c.status,
         is_viewed=c.is_viewed,
-        created_at=str(c.created_at),
+        created_at=c.created_at,
     )
 
 

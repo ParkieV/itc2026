@@ -8,6 +8,6 @@ class Document:
     file: str
     authors: list[int]
     stage_id: int
-    created_at: int | None = None
-    modified_at: int | None = None
+    created_at: str | None = None
+    modified_at: str | None = None
     pdf_file: str | None = None

@@ -1,12 +1,10 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
 from entities.comment import Comment
 from repositories.inmemory_comments_repo import AsyncInMemoryCommentsRepository
 from services.comment_exceptions import CommentNotFound
 from services.get_pdf_document.service import GetPdfDocumentService
 from services.get_stage_by_id.service import GetStageByIdService
 from services.get_user.service import GetUserService
+from utils.datetime_iso import now_iso_msk
 
 
 class CreateCommentService:
@@ -21,10 +19,6 @@ class CreateCommentService:
         self._get_pdf_document_service = get_pdf_document_service
         self._get_stage_by_id_service = get_stage_by_id_service
         self._get_user_service = get_user_service
-
-    @staticmethod
-    def _now_msk_timestamp() -> int:
-        return int(datetime.now(ZoneInfo("Europe/Moscow")).timestamp())
 
     async def execute(
         self,
@@ -52,7 +46,7 @@ class CreateCommentService:
                 subject=subject,
                 content=content,
                 xfdf=xfdf,
-                created_at=self._now_msk_timestamp(),
+                created_at=now_iso_msk(),
                 reply_to=reply_to,
             )
         )

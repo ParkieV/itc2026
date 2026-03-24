@@ -47,8 +47,8 @@ async def cabinet_document_get(
             file=detail.document.file,
             authors=detail.document.authors,
             stage_id=detail.document.stage_id,
-            created_at=str(detail.document.created_at),
-            modified_at=str(detail.document.modified_at),
+            created_at=detail.document.created_at or "",
+            modified_at=detail.document.modified_at or "",
             pdf_file=detail.document.pdf_file,
         ),
         reviews=[
@@ -73,7 +73,7 @@ async def cabinet_document_get(
                 xfdf=c.xfdf,
                 status=c.status,
                 is_viewed=c.is_viewed,
-                created_at=str(c.created_at),
+                created_at=c.created_at,
             )
             for c in detail.comments
         ],
