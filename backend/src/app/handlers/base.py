@@ -5,6 +5,7 @@ from .v1_change_doc_stage_post import router as v1_change_doc_stage_post_router
 from .v1_cabinet_client_get import router as v1_cabinet_client_get_router
 from .v1_cabinet_document_file_get import router as v1_cabinet_document_file_get_router
 from .v1_cabinet_document_pdf_file_get import router as v1_cabinet_document_pdf_file_get_router
+from .v1_cabinet_document_file_post import router as v1_cabinet_document_file_post_router
 from .v1_stages_list_get import router as v1_stages_get_router
 
 router = APIRouter()
@@ -14,4 +15,5 @@ router.include_router(v1_change_doc_stage_post_router)
 router.include_router(v1_cabinet_client_get_router)
 router.include_router(v1_cabinet_document_file_get_router)
 router.include_router(v1_cabinet_document_pdf_file_get_router)
+router.include_router(v1_cabinet_document_file_post_router)
 router.include_router(v1_stages_get_router)

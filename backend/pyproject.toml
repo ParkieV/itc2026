@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "dishka>=1.9.1",
+    "docx2pdf>=0.1.8",
     "fastapi>=0.135.1",
     "pandas>=3.0.1",
     "pydantic>=2.12.5",
