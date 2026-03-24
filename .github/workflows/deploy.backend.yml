@@ -1,20 +1,18 @@
 
-name: Deploy Docker Compose App
+name: Deploy backend
 
 on:
   pull_request:
-    types: [closed]
-    branches: [main]
-    paths:
-      - 'backend/**'
-      - 'infra/**'
-      - '.github/workflows/main.yml'
+    types:
+      - closed
+    branches:
+      - backend/main
 
 jobs:
   deploy:
     name: Deploy to Server
-    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'backend/') }}
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
 
     steps:
       - name: Checkout code
@@ -27,10 +25,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -euo pipefail
-            cd "${{ secrets.PROJECT_DIR }}"
-            git fetch --all
-            git checkout main
-            git pull origin main
+            cd ${{ secrets.PROJECT_DIR }}
+            git switch backend/main
+            git pull origin backend/main
             docker compose up --build -d
 

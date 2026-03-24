@@ -40,6 +40,43 @@ paths:
                 $ref: "#/components/schemas/V1CabinetClientGetResponse"
       security:
         - OAuth2PasswordBearer: []
+  /v1/stages:
+    get:
+      summary: List stages
+      operationId: list_stages_v1_stages_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StageWithReviewerAndDocsGetResponse"
+      security:
+        - OAuth2PasswordBearer: []
+  /v1/stages/{id}:
+    get:
+      summary: Get stage by id
+      operationId: get_stage_v1_stages_id_get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StageGetResponse"
+        "404":
+          description: Stage not found
+      security:
+        - OAuth2PasswordBearer: []
 components:
   schemas:
     Body_authenticate_v1_auth_authenticate_post:
@@ -112,6 +149,95 @@ components:
         - fio
         - login
       title: V1CabinetClientGetResponse
+    User:
+      properties:
+        user_id:
+          type: string
+          title: User Id
+        login:
+          type: string
+          title: Login
+        fio:
+          type: string
+          title: Fio
+        scope:
+          type: string
+          title: Scope
+      type: object
+      required:
+        - user_id
+        - login
+        - fio
+        - scope
+      title: User
+    StageGetResponse:
+      properties:
+        stage_id:
+          type: integer
+          title: Stage Id
+        next_stage:
+          type: integer
+          title: Next Stage
+        title:
+          type: string
+          title: Title
+        docs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          title: Docs
+        reviewers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+          title: Reviewers
+      type: object
+      required:
+        - stage_id
+        - next_stage
+        - title
+        - docs
+        - reviewers
+      title: StageGetResponse
+    StageSummaryGetResponse:
+      properties:
+        stage_id:
+          type: integer
+          title: Stage Id
+        next_stage:
+          type: integer
+          title: Next Stage
+        title:
+          type: string
+          title: Title
+      type: object
+      required:
+        - stage_id
+        - next_stage
+        - title
+      title: StageSummaryGetResponse
+    StageWithReviewerAndDocsGetResponse:
+      properties:
+        stage:
+          $ref: "#/components/schemas/StageSummaryGetResponse"
+        docs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          title: Docs
+        reviewers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+          title: Reviewers
+      type: object
+      required:
+        - stage
+        - docs
+        - reviewers
+      title: StageWithReviewerAndDocsGetResponse
     ValidationError:
       properties:
         loc:

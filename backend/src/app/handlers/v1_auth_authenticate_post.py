@@ -4,11 +4,27 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from usecases.authorize_user.usecase import AuthorizeUserUseCase
 from usecases.authorize_user import exceptions
-from .dtos.v1_auth_authenticate_post import V1AuthAuthenticatePostResponse
+from .dtos.helper import openapi_responses
+from .dtos.v1_auth_authenticate_post import (
+    V1_AUTH_AUTHENTICATE_POST_RESPONSE200,
+    V1_AUTH_AUTHENTICATE_POST_RESPONSE400,
+    V1_AUTH_AUTHENTICATE_POST_RESPONSE404,
+    V1AuthAuthenticatePostResponse,
+)
 
 router = APIRouter()
 
-@router.post('/v1/auth/authenticate')
+
+@router.post(
+    "/v1/auth/authenticate",
+    responses=openapi_responses(
+        {
+            200: V1_AUTH_AUTHENTICATE_POST_RESPONSE200,
+            400: V1_AUTH_AUTHENTICATE_POST_RESPONSE400,
+            404: V1_AUTH_AUTHENTICATE_POST_RESPONSE404,
+        }
+    ),
+)
 @inject
 async def authenticate(
         authorize_user_uc: FromDishka[AuthorizeUserUseCase],
