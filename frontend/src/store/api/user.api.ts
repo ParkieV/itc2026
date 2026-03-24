@@ -1,5 +1,5 @@
-import { api } from '@/store/api/api'
-import { TUser } from '@/types/api'
+import { api } from '@store/api/api'
+import { TUser } from '@shared/types/api'
 export const arsenalApi = api.injectEndpoints({
 	endpoints: builder => ({
 		patchUser: builder.mutation({

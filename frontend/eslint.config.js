@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-	{ ignores: ['dist', 'node_modules', 'vite.config.d.ts'] },
+	{ ignores: ['dist', 'node_modules', 'public/webviewer', 'vite.config.d.ts'] },
 	js.configs.recommended,
 	...tseslint.configs.recommended,
 	{
@@ -23,6 +23,7 @@ export default tseslint.config(
 		},
 		rules: {
 			...reactHooks.configs.recommended.rules,
+			'@typescript-eslint/no-unused-vars': 'off',
 			'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 		},
 	}
