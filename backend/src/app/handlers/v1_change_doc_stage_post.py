@@ -38,3 +38,7 @@ async def change_doc_stage(
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
     except exceptions.InvalidTargetStage as err_invalid_target_stage:
         raise HTTPException(status_code=400, detail=str(err_invalid_target_stage)) from err_invalid_target_stage
+    except exceptions.DocumentRevisionRequired as err_revision:
+        raise HTTPException(status_code=400, detail=str(err_revision)) from err_revision
+    except exceptions.ReviewsNotAllAccepted as err_reviews:
+        raise HTTPException(status_code=400, detail=str(err_reviews)) from err_reviews
