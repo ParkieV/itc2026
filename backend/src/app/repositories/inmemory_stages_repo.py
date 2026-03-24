@@ -28,11 +28,11 @@ class AsyncInMemoryStagesRepository:
             for _, row in df.iterrows()
         ]
 
-    async def get_by_id(self, stage_id: int) -> Stage:
+    async def get_by_id(self, stage_id: int) -> Stage | None:
         try:
             row = self.stages.loc[stage_id]
         except KeyError:
-            raise StageNotFound(f"stage with id={stage_id} not found") from None
+            return None
 
         return Stage(
             stage_id=int(row.name),
