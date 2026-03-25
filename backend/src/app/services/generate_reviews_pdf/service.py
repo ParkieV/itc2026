@@ -1,7 +1,10 @@
 import asyncio
 from dataclasses import dataclass
+from html import unescape
 from io import BytesIO
+import json
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
@@ -26,14 +29,19 @@ class MockReview:
     position: int
     structural_element: str
     organization: str
-    remark: str | None
-    proposal: str | None
-    justification: str | None
+    remark: str
+    proposal: str
+    justification: str
     developer_response: str
 
 
 class GenerateReviewsPdfService:
     _FONT_NAME = "TimesNewRoman"
+    _CONTENTS_SECTION_HEADERS = {
+        "remark": "Замечание/предложение:",
+        "proposal": "Предлагаемая редакция:",
+        "justification": "Обоснование предлагаемой редакции:",
+    }
     _PAGE_SIZE = landscape(A4)
     _LEFT_MARGIN = 20 * mm
     _RIGHT_MARGIN = 20 * mm
@@ -358,20 +366,94 @@ class GenerateReviewsPdfService:
             reply = reply_map.get(c.comment_id)
             developer_response = (reply.developer_response or "") if reply else ""
             organization = users_by_id.get(c.user_id).organization if c.user_id in users_by_id else ""
+            structural_element, remark, proposal, justification = self._extract_xfdf_fields(c.xfdf)
 
             reviews.append(
                 MockReview(
                     position=position,
-                    structural_element=(
-                        f"Раздел {position}. Требования к подсистеме диспетчеризации "
-                        "перевозок опасных грузов"
-                    ),
+                    structural_element=structural_element,
                     organization=organization,
-                    remark=c.remark,
-                    proposal=c.proposal,
-                    justification=c.justification,
+                    remark=remark,
+                    proposal=proposal,
+                    justification=justification,
                     developer_response=developer_response,
                 )
             )
 
         return reviews
+
+    @classmethod
+    def _extract_xfdf_fields(cls, xfdf: str) -> tuple[str, str, str, str]:
+        if not xfdf.strip():
+            return "", "", "", ""
+
+        try:
+            root = ET.fromstring(xfdf)
+        except ET.ParseError:
+            return "", "", "", ""
+
+        annot = next(root.iterfind(".//{*}annots/*"), None)
+        if annot is None:
+            return "", "", "", ""
+
+        preview = cls._extract_annot_preview(annot)
+        contents_node = annot.find(".//{*}contents")
+        contents = ""
+        if contents_node is not None:
+            contents = unescape("".join(contents_node.itertext()).strip())
+
+        sections = cls._extract_contents_sections(contents)
+        return (
+            preview,
+            sections["remark"],
+            sections["proposal"],
+            sections["justification"],
+        )
+
+    @staticmethod
+    def _extract_annot_preview(annot: ET.Element) -> str:
+        direct_preview = (annot.attrib.get("trn-annot-preview") or "").strip()
+        if direct_preview:
+            return unescape(direct_preview)
+
+        custom_data = annot.find(".//{*}trn-custom-data")
+        if custom_data is None:
+            return ""
+
+        bytes_attr = (custom_data.attrib.get("bytes") or "").strip()
+        if not bytes_attr:
+            return ""
+
+        try:
+            parsed = json.loads(unescape(bytes_attr))
+        except json.JSONDecodeError:
+            return ""
+
+        preview = parsed.get("trn-annot-preview")
+        return unescape(preview.strip()) if isinstance(preview, str) else ""
+
+    @classmethod
+    def _extract_contents_sections(cls, contents: str) -> dict[str, str]:
+        if not contents:
+            return {key: "" for key in cls._CONTENTS_SECTION_HEADERS}
+
+        lines = contents.splitlines()
+        values = {key: [] for key in cls._CONTENTS_SECTION_HEADERS}
+        current_key: str | None = None
+        header_to_key = {
+            header: key for key, header in cls._CONTENTS_SECTION_HEADERS.items()
+        }
+
+        for line in lines:
+            stripped_line = line.strip()
+            if stripped_line in header_to_key:
+                current_key = header_to_key[stripped_line]
+                continue
+
+            if current_key is not None:
+                values[current_key].append(line)
+
+        return {
+            key: "\n".join(lines).strip()
+            for key, lines in values.items()
+        }
