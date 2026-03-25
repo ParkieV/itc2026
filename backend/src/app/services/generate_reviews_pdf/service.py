@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
@@ -11,28 +12,43 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+from entities.comment import Comment
+from entities.user import User
+from services.get_comments_by_doc.service import GetCommentsByDocService
+from services.get_user.exceptions import UserNotFound
+from services.get_user.service import GetUserService
+
 
 @dataclass(frozen=True, slots=True)
 class MockReview:
     position: int
     structural_element: str
     organization: str
-    comment: str
-    proposed_revision: str
-    rationale: str
+    remark: str | None
+    proposal: str | None
+    justification: str | None
     developer_response: str
 
 
 class GenerateReviewsPdfService:
     _FONT_NAME = "TimesNewRoman"
+    _FONTS_DIR = Path(__file__).resolve().parents[3] / "static" / "fonts"
     _FONT_PATHS = {
-        "normal": Path("/System/Library/Fonts/Supplemental/Times New Roman.ttf"),
-        "bold": Path("/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf"),
-        "italic": Path("/System/Library/Fonts/Supplemental/Times New Roman Italic.ttf"),
-        "boldItalic": Path("/System/Library/Fonts/Supplemental/Times New Roman Bold Italic.ttf"),
+        "normal": _FONTS_DIR / "Times New Roman.ttf",
+        "bold": _FONTS_DIR / "Times New Roman Bold.ttf",
+        "italic": _FONTS_DIR / "Times New Roman Italic.ttf",
+        "boldItalic": _FONTS_DIR / "Times New Roman Bold Italic.ttf",
     }
 
-    def execute(self) -> bytes:
+    def __init__(
+        self,
+        get_comments_by_doc_service: GetCommentsByDocService,
+        get_user_service: GetUserService,
+    ) -> None:
+        self._get_comments_by_doc_service = get_comments_by_doc_service
+        self._get_user_service = get_user_service
+
+    async def execute(self, doc_id: int) -> bytes:
         self._register_times_new_roman()
         buffer = BytesIO()
         document = SimpleDocTemplate(
@@ -47,7 +63,10 @@ class GenerateReviewsPdfService:
         styles = self._build_styles()
         story = self._build_title_flowables(styles["title"])
         story.append(Spacer(1, 8 * mm))
-        story.append(self._build_table(styles["header"], styles["body"], styles["body_center"]))
+        comments = await self._get_comments_by_doc_service.execute(doc_id)
+        users_by_id = await self._get_users_by_id_for_top_comments(comments)
+        reviews = self._build_mock_reviews(comments, users_by_id)
+        story.append(self._build_table(styles["header"], styles["body"], styles["body_center"], reviews))
 
         document.build(story)
         return buffer.getvalue()
@@ -68,6 +87,7 @@ class GenerateReviewsPdfService:
         header_style: ParagraphStyle,
         body_style: ParagraphStyle,
         body_center_style: ParagraphStyle,
+        reviews: list[MockReview],
     ) -> Table:
         rows: list[list[Paragraph]] = [
             [
@@ -81,16 +101,16 @@ class GenerateReviewsPdfService:
             ]
         ]
 
-        for review in self._build_mock_reviews():
+        for review in reviews:
             rows.append(
                 [
                     Paragraph(str(review.position), body_center_style),
                     Paragraph(review.structural_element, body_style),
                     Paragraph(review.organization, body_style),
-                    Paragraph(review.comment, body_style),
-                    Paragraph(review.proposed_revision, body_style),
-                    Paragraph(review.rationale, body_style),
-                    Paragraph(review.developer_response, body_style),
+                    Paragraph(review.remark or "", body_style),
+                    Paragraph(review.proposal or "", body_style),
+                    Paragraph(review.justification or "", body_style),
+                    Paragraph(review.developer_response or "", body_style),
                 ]
             )
 
@@ -189,31 +209,66 @@ class GenerateReviewsPdfService:
             boldItalic=f"{self._FONT_NAME}-BoldItalic",
         )
 
-    def _build_mock_reviews(self) -> list[MockReview]:
-        return [
-            MockReview(
-                position=index,
-                structural_element=f"Раздел {index}. Требования к подсистеме диспетчеризации перевозок опасных грузов",
-                organization=(
-                    f"ООО «Организация {index}» "
-                    f"(исх. № {100 + index} от {index:02d}.03.2026)"
-                ),
-                comment=(
-                    "Предлагается уточнить состав обязательных данных, которые должны "
-                    "передаваться в подсистему, а также порядок обновления этих сведений."
-                ),
-                proposed_revision=(
-                    "Установить минимальный обязательный набор данных о транспортном средстве, "
-                    "маршруте, грузе и статусе перевозки с обновлением не реже одного раза в 5 минут."
-                ),
-                rationale=(
-                    "Такая редакция исключает неоднозначность при внедрении стандарта в "
-                    "региональных системах и облегчает контроль полноты передаваемой информации."
-                ),
-                developer_response=(
-                    "Принято частично. В окончательной редакции будут уточнены состав обязательных "
-                    "полей и минимальная периодичность обновления сведений."
-                ),
+    @staticmethod
+    def _build_reply_map(comments: list[Comment]) -> dict[int, Comment]:
+        """
+        reply_to -> reply_comment
+        Берём первое совпадение по reply_to, чтобы не дублировать данные.
+        """
+        out: dict[int, Comment] = {}
+        # Сортируем по id, чтобы "первое совпадение" было детерминированным.
+        for c in sorted(comments, key=lambda x: x.comment_id):
+            if c.reply_to is None:
+                continue
+            out.setdefault(c.reply_to, c)
+        return out
+
+    async def _get_users_by_id_for_top_comments(
+        self,
+        comments: list[Comment],
+    ) -> dict[int, User]:
+        top_comments = [c for c in comments if c.reply_to is None]
+        author_ids = sorted({c.user_id for c in top_comments})
+        if not author_ids:
+            return {}
+
+        async def _fetch(aid: int) -> tuple[int, User | None]:
+            try:
+                return aid, await self._get_user_service.execute(aid)
+            except UserNotFound:
+                return aid, None
+
+        fetched = await asyncio.gather(*(_fetch(aid) for aid in author_ids))
+        return {aid: u for aid, u in fetched if u is not None}
+
+    def _build_mock_reviews(
+        self,
+        comments: list[Comment],
+        users_by_id: dict[int, User],
+    ) -> list[MockReview]:
+        comments_sorted = sorted(comments, key=lambda x: x.comment_id)
+        reply_map = self._build_reply_map(comments_sorted)
+        top_comments = [c for c in comments_sorted if c.reply_to is None]
+
+        reviews: list[MockReview] = []
+        for position, c in enumerate(top_comments, start=1):
+            reply = reply_map.get(c.comment_id)
+            developer_response = (reply.developer_response or "") if reply else ""
+            organization = users_by_id.get(c.user_id).organization if c.user_id in users_by_id else ""
+
+            reviews.append(
+                MockReview(
+                    position=position,
+                    structural_element=(
+                        f"Раздел {position}. Требования к подсистеме диспетчеризации "
+                        "перевозок опасных грузов"
+                    ),
+                    organization=organization,
+                    remark=c.remark,
+                    proposal=c.proposal,
+                    justification=c.justification,
+                    developer_response=developer_response,
+                )
             )
-            for index in range(1, 19)
-        ]
+
+        return reviews

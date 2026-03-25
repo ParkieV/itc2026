@@ -35,7 +35,7 @@ class AsyncInMemoryCommentsRepository:
                     "remark": "LGTM",
                     "proposal": "No additional comments.",
                     "justification": pd.NA,
-                    "developer_response": pd.NA,
+                    "developer_response": "Прочитай если сосал",
                     "xfdf": "",
                     "status": pd.NA,
                     "is_viewed": False,
