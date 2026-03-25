@@ -17,6 +17,8 @@ class AsyncInMemoryUserRepository:
                     "scope": "user",
                     "fio": "Тестовый Пользователь",
                     "email": "test_user@example.com",
+                    "organization": "Тестовая Организация",
+                    "phone": "+79991234567",
                 },
                 {
                     "user_id": 2,
@@ -24,7 +26,9 @@ class AsyncInMemoryUserRepository:
                     "password": "password123",
                     "scope": "user",
                     "fio": "Тестовый Пользователь",
-                    "email": "yarik@example.com",
+                    "email": "kinsoprod@yandex.ru",
+                    "organization": "Тестовая Организация 2",
+                    "phone": "+79991234568",
                 },
                 {
                     "user_id": 3,
@@ -33,6 +37,8 @@ class AsyncInMemoryUserRepository:
                     "scope": "user",
                     "fio": "Тестовый Пользователь",
                     "email": "timosha@example.com",
+                    "organization": "Тестовая Организация 3",
+                    "phone": "+79991234569",
                 },
             ]
         ).set_index(["user_id", "login"])
@@ -55,6 +61,8 @@ class AsyncInMemoryUserRepository:
             scope=user_dict["scope"],
             fio=user_dict["fio"],
             email=str(user_dict.get("email", "") or ""),
+            organization=user_dict["organization"],
+            phone=user_dict["phone"],
         )
 
     async def get_by_id(self, user_id: int) -> User | None:
@@ -71,4 +79,6 @@ class AsyncInMemoryUserRepository:
             scope=user_dict["scope"],
             fio=user_dict["fio"],
             email=str(user_dict.get("email", "") or ""),
+            organization=user_dict["organization"],
+            phone=user_dict["phone"],
         )

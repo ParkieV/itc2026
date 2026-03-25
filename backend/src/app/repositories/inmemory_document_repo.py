@@ -39,7 +39,7 @@ class InMemoryDocumentRepository:
                 "modified_at": now_iso,
             },
         }
-        self._count = len(self._paths_by_file_id) + 1
+        self._count = len(self._paths_by_file_id.keys()) + 1
 
     def _add_count(self) -> None:
         self._count += 1

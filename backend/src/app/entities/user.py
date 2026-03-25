@@ -9,3 +9,5 @@ class User:
     scope: str
     fio: str
     email: str
+    organization: str
+    phone: str
