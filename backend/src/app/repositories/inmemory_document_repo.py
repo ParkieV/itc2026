@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from typing import Literal
 
 from entities import Document
 from utils.datetime_iso import now_iso_msk
@@ -115,5 +116,38 @@ class InMemoryDocumentRepository:
         self._docs_by_doc_id[document_id] = asdict(patched)
         return str(document_id)
 
-    def get_document_with_filters(self, document_id: int) -> list[Document]:
-        ...
+    def get_document_with_filters(
+        self,
+        author_id: int,
+        stage_id: int | None = None,
+        roles: list[Literal['author', 'reviewer']] | None = None,
+        review_statuses: list[Literal['accepted', 'declined']] | None = None,
+        categories: list[str] | None = None,
+        doc_statuses: list[Literal['new_comment', 'not_viewed', 'viewed', 'waiting', 'action_required', 'sent']] | None = None,
+        ) -> list[Document]:
+        filtered = self._docs_by_doc_id.items()
+        if stage_id is not None:
+            filtered = [(doc_id, doc) for doc_id, doc in filtered if doc['stage_id'] == stage_id]
+        if roles is not None:
+            if 'author' in roles:
+                filtered = [(doc_id, doc) for doc_id, doc in filtered if author_id in doc['authors']]
+        if review_statuses is not None:
+            filtered = [(doc_id, doc) for doc_id, doc in filtered if doc['review_status'] in review_statuses]
+        if categories is not None:
+            filtered = [(doc_id, doc) for doc_id, doc in filtered if doc['categories'] in categories]
+        if doc_statuses is not None:
+            filtered = [(doc_id, doc) for doc_id, doc in filtered if doc['doc_status'] in doc_statuses]
+        return [
+            Document(
+                title=document_model['title'],
+                description=document_model['description'],
+                file_id=document_model['file_id'],
+                pdf_file_id=document_model['pdf_file_id'],
+                authors=document_model['authors'],
+                stage_id=document_model['stage_id'],
+                created_at=document_model['created_at'],
+                modified_at=document_model['modified_at'],
+                doc_id=doc_id,
+            )
+            for doc_id, document_model in filtered
+        ]
