@@ -33,6 +33,7 @@ class CreateCommentService:
         remark: str | None,
         proposal: str | None,
         justification: str | None,
+        developer_response: str | None,
         xfdf: str,
         reply_to: int | None = None,
     ) -> None:
@@ -52,7 +53,7 @@ class CreateCommentService:
                 remark=remark,
                 proposal=proposal,
                 justification=justification,
-                developer_response=None,
+                developer_response=developer_response,
                 xfdf=xfdf,
                 created_at=now_iso_msk(),
                 reply_to=reply_to,

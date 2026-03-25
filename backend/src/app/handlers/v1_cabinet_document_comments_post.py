@@ -44,6 +44,7 @@ async def create_document_comment(
             remark=request.remark,
             proposal=request.proposal,
             justification=request.justification,
+            developer_response=request.developer_response,
             xfdf=request.xfdf,
             reply_to=request.reply_to,
         )
