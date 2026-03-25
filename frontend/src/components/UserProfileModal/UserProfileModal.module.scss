@@ -1,0 +1,389 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 20000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: rgb(15 23 42 / 25%);
+	backdrop-filter: blur(4px);
+}
+
+.dialog {
+	position: relative;
+	width: min(1103px, 100%);
+	max-height: min(88vh, 820px);
+	overflow: auto;
+	padding: 16px;
+	border-radius: 8px;
+	background: rgba(27, 28, 30, 0.05);
+	backdrop-filter: blur(60px);
+	border: 1px solid rgba(27, 28, 30, 0.1);
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	
+}
+
+.closeBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	color: #222b33;
+	margin-left: auto;
+
+	&:hover {
+		background: rgba(2, 6, 23, 0.06);
+	}
+}
+
+.header {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	justify-content: space-between;
+}
+
+.headerLeft {
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+}
+
+.avatarCircle {
+	width: 56px;
+	height: 56px;
+	border-radius: 999px;
+	background: #dbeafe;
+	color: #0b44ff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 800;
+	letter-spacing: -0.72px;
+	font-size: 16px;
+	flex-shrink: 0;
+}
+
+.headerText {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.email {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 500;
+	color: rgba(34, 43, 51, 0.5);
+	line-height: 24px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.headerRight {
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-end;
+}
+
+.contentStack {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.mainCard {
+	background: #fff;
+	border-radius: 8px;
+	height: 350px;
+	overflow: hidden;
+	margin-bottom: 2px;
+}
+
+.cardCol {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	padding: 23.5px 24px;
+	height: 100%;
+}
+
+.cardBlock {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.label {
+	margin: 0;
+	font-size: 16px;
+	line-height: 20px;
+	font-family: "Roboto Mono", monospace;
+	font-weight: 400;
+	color: rgba(34, 43, 51, 0.5);
+}
+
+.value {
+	margin: 0;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 600;
+	letter-spacing: -0.48px;
+	color: #222b33;
+	max-width: 1005px;
+}
+
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.chip {
+	background: rgba(34, 43, 51, 0.05);
+	padding: 12px 24px;
+	border-radius: 999px;
+	font-size: 16px;
+	line-height: 28px;
+	font-weight: 600;
+	color: rgba(34, 43, 51, 0.5);
+	white-space: nowrap;
+}
+
+.statsCard {
+	background: #fff;
+	height: 108px;
+	border-radius: 8px 8px 0 0;
+	overflow: hidden;
+}
+
+.statsRow {
+	height: 108px;
+	padding: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.statItem {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	white-space: nowrap;
+}
+
+.statLabel {
+	margin: 0;
+	font-size: 16px;
+	line-height: 20px;
+	font-family: "Roboto Mono", monospace;
+	font-weight: 400;
+	color: rgba(34, 43, 51, 0.5);
+}
+
+.statValue {
+	margin: 0;
+	font-size: 32px;
+	line-height: 36px;
+	font-weight: 600;
+	letter-spacing: -0.96px;
+	color: #222b33;
+}
+
+.statValueAccent {
+	margin: 0;
+	font-size: 32px;
+	line-height: 36px;
+	font-weight: 600;
+	letter-spacing: -0.96px;
+	color: #b16e10;
+}
+
+.statDivider {
+	width: 1px;
+	height: 48px;
+	background: rgba(34, 43, 51, 0.1);
+}
+
+.titleBlock {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.name {
+	margin: 0;
+	font-size: 24px;
+	font-weight: 700;
+	letter-spacing: -0.72px;
+	color: #222b33;
+	line-height: 28px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.organization {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 500;
+	color: rgba(34, 43, 51, 0.55);
+	line-height: 20px;
+}
+
+.body {
+	margin-top: 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.mockStatsTop {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px;
+	border-radius: 12px;
+	background: rgba(27, 28, 30, 0.04);
+}
+
+.mockStat {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.mockLabel {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	color: rgba(34, 43, 51, 0.55);
+	white-space: nowrap;
+}
+
+.mockValue {
+	margin: 0;
+	font-size: 32px;
+	font-weight: 700;
+	letter-spacing: -0.96px;
+	line-height: 36px;
+	color: #222b33;
+}
+
+.mockDivider {
+	width: 1px;
+	height: 34px;
+	background: rgba(34, 43, 51, 0.12);
+}
+
+.section {
+	border: 1px solid rgba(34, 43, 51, 0.06);
+	border-radius: 14px;
+	padding: 14px 14px;
+}
+
+.sectionTitleRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.sectionTitle {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 700;
+	color: #222b33;
+}
+
+.sectionChip,
+.sectionChipAlt {
+	padding: 8px 12px;
+	border-radius: 999px;
+	font-size: 14px;
+	line-height: 16px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.sectionChip {
+	background: rgba(193, 169, 71, 0.1);
+	color: #c1a947;
+}
+
+.sectionChipAlt {
+	background: rgba(34, 43, 51, 0.05);
+	color: rgba(34, 43, 51, 0.8);
+}
+
+.sectionText {
+	margin: 0;
+	font-size: 14px;
+	line-height: 20px;
+	color: rgba(34, 43, 51, 0.6);
+}
+
+.footer {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	overflow: hidden;
+}
+
+.editBtn {
+	width: 100%;
+	border: none;
+	height: 68px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 0;
+	border-radius: 0 0 4px 4px;
+	background: #0b44ff;
+	color: #fff;
+	font-weight: 700;
+	font-size: 18px;
+	cursor: pointer;
+
+	&:hover {
+		background: #0838cc;
+	}
+}
+
+.editIcon {
+	color: #fff;
+}
+
+.exitBtn {
+	width: 100%;
+	margin-top: 0;
+	height: 44px;
+	padding: 0 16px;
+	border-radius: 12px;
+	border: 1px solid rgba(226, 232, 240, 1);
+	background: #fff;
+	color: #0f172a;
+	font-weight: 700;
+	font-size: 15px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		background: #f8fafc;
+	}
+}
+

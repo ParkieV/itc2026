@@ -1,0 +1,199 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 30000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: rgba(0, 0, 0, 0.2);
+	backdrop-filter: blur(4px);
+}
+
+.dialog {
+	width: min(607px, 100%);
+	max-height: min(88vh, 820px);
+	overflow: hidden;
+	background: #fff;
+	border-radius: 8px;
+	border: 1px solid rgba(27, 28, 30, 0.08);
+	display: flex;
+	flex-direction: column;
+}
+
+.header {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 16px 24px;
+	background: #fff;
+	border-bottom: 1px solid rgba(244, 244, 244, 1);
+}
+
+.title {
+	margin: 0;
+	font-family: 'InterDisplay', sans-serif;
+	font-weight: 600;
+	font-size: 24px;
+	line-height: 28px;
+	letter-spacing: -0.03em;
+	color: #1b1c1e;
+}
+
+.closeBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	border: none;
+	background: transparent;
+	color: #222b33;
+	cursor: pointer;
+
+	&:hover {
+		background: rgba(2, 6, 23, 0.06);
+	}
+}
+
+.content {
+	flex: 1;
+	overflow: auto;
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.sectionTitle {
+	margin: 0;
+	font-family: 'InterDisplay', sans-serif;
+	font-weight: 600;
+	font-size: 24px;
+	line-height: 28px;
+	letter-spacing: -0.03em;
+	color: #1b1c1e;
+}
+
+.chipsGrid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px 16px;
+	border-radius: 999px;
+	border: 1px solid rgba(27, 28, 30, 0.1);
+	background: rgba(27, 28, 30, 0.05);
+	color: #222b33;
+	cursor: pointer;
+	box-sizing: border-box;
+
+	&:hover {
+		background: rgba(27, 28, 30, 0.07);
+	}
+}
+
+.chipIcon {
+	flex-shrink: 0;
+}
+
+.chipLabel {
+	font-family: 'Roboto Mono', monospace;
+	font-size: 16px;
+	line-height: 20px;
+	color: inherit;
+	white-space: nowrap;
+}
+
+.chipActiveAccent {
+	background: rgba(11, 68, 255, 0.08);
+	border-color: rgba(11, 68, 255, 0.25);
+	color: #0b44ff;
+}
+
+.chipActiveStage {
+	border-color: rgba(27, 28, 30, 0.2);
+	background: rgba(27, 28, 30, 0.05);
+}
+
+.chipActiveIntermediate {
+	/* активность задаётся инлайном, но класс держим для бордеров/hover */
+	border-color: rgba(27, 28, 30, 0.15);
+}
+
+.stageDot {
+	width: 12px;
+	height: 12px;
+	border-radius: 999px;
+	background: rgba(34, 43, 51, 0.2);
+	flex-shrink: 0;
+}
+
+.footer {
+	position: sticky;
+	bottom: 0;
+	z-index: 2;
+	background: #fff;
+	border-top: 1px solid rgba(244, 244, 244, 1);
+	padding: 16px 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.applyBtn {
+	flex: 1;
+	min-width: 0;
+	min-height: 72px;
+	border: none;
+	border-radius: 999px;
+	background: #0b44ff;
+	color: #fff;
+	cursor: pointer;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 18px;
+	line-height: 20px;
+	padding: 20px 24px;
+
+	&:hover {
+		filter: brightness(1.05);
+	}
+}
+
+.clearBtn {
+	flex: 0 0 auto;
+	min-width: 176px;
+	min-height: 72px;
+	border-radius: 999px;
+	border: none;
+	background: rgba(27, 28, 30, 0.05);
+	color: #222b33;
+	cursor: pointer;
+	font-family: 'Roboto Mono', monospace;
+	font-size: 18px;
+	line-height: 20px;
+	padding: 20px 24px;
+
+	&:hover {
+		background: rgba(27, 28, 30, 0.08);
+	}
+}
+

@@ -43,6 +43,7 @@ const DOCUMENT_USER_STATUS_TO_UI: Record<DocumentUserStatus, KanbanDocumentStatu
 	new_comment: 'new_comment',
 	not_viewed: 'not_viewed',
 	viewed: 'viewed',
+	waiting: 'waiting',
 	edits_required: 'edits_required',
 	action_required: 'action_required',
 	sent: 'sent',

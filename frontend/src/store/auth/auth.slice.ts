@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-
+import cookies from 'js-cookie'
 
 interface initialState {
 	token: string | null
 }
 
 const initialState: initialState = {
-	token: localStorage.getItem('token') || null
+	token: cookies.get('token') || null
 }
 
 export const authSlice = createSlice({
@@ -15,11 +15,11 @@ export const authSlice = createSlice({
 	reducers: {
 		setToken: (state, action: PayloadAction<string>) => {
 			state.token = action.payload
-			localStorage.setItem('token', action.payload)
+			cookies.set('token', action.payload, { expires: 1 / 24, secure: true })
 		},
 		clearToken: (state) => {
 			state.token = null
-			localStorage.removeItem('token')
+			cookies.remove('token')
 		},
 	}
 })
