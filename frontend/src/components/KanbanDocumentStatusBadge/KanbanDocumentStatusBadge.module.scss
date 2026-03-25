@@ -1,0 +1,53 @@
+.statusBadge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 12px;
+	border-radius: 999px;
+	font-size: 14px;
+	line-height: 16px;
+	letter-spacing: -0.03em;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.statusIcon {
+	flex-shrink: 0;
+}
+
+/* нейтральные: ожидание, не просмотрено */
+.status_waiting,
+.status_not_viewed {
+	background: rgba(34, 43, 51, 0.05);
+	color: #222b33;
+}
+
+.status_edits_required {
+	background: #ae402f;
+	color: #fff;
+}
+
+.status_new_comment {
+	background: #344da0;
+	color: #fff;
+}
+
+.status_action_required {
+	background: #903563;
+	color: #fff;
+}
+
+.status_sent {
+	background: #3b7488;
+	color: #fff;
+}
+
+.status_viewed {
+	background: #0c6382;
+	color: #fff;
+}
+
+.status_in_progress {
+	background: #222b33;
+	color: #fff;
+}
