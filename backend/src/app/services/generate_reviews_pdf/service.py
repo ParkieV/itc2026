@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
@@ -12,7 +13,10 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from entities.comment import Comment
+from entities.user import User
 from services.get_comments_by_doc.service import GetCommentsByDocService
+from services.get_user.exceptions import UserNotFound
+from services.get_user.service import GetUserService
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,8 +39,13 @@ class GenerateReviewsPdfService:
         "boldItalic": Path("/System/Library/Fonts/Supplemental/Times New Roman Bold Italic.ttf"),
     }
 
-    def __init__(self, get_comments_by_doc_service: GetCommentsByDocService) -> None:
+    def __init__(
+        self,
+        get_comments_by_doc_service: GetCommentsByDocService,
+        get_user_service: GetUserService,
+    ) -> None:
         self._get_comments_by_doc_service = get_comments_by_doc_service
+        self._get_user_service = get_user_service
 
     async def execute(self, doc_id: int) -> bytes:
         self._register_times_new_roman()
@@ -53,7 +62,9 @@ class GenerateReviewsPdfService:
         styles = self._build_styles()
         story = self._build_title_flowables(styles["title"])
         story.append(Spacer(1, 8 * mm))
-        reviews = self._build_mock_reviews(await self._get_comments_by_doc_service.execute(doc_id))
+        comments = await self._get_comments_by_doc_service.execute(doc_id)
+        users_by_id = await self._get_users_by_id_for_top_comments(comments)
+        reviews = self._build_mock_reviews(comments, users_by_id)
         story.append(self._build_table(styles["header"], styles["body"], styles["body_center"], reviews))
 
         document.build(story)
@@ -211,7 +222,29 @@ class GenerateReviewsPdfService:
             out.setdefault(c.reply_to, c)
         return out
 
-    def _build_mock_reviews(self, comments: list[Comment]) -> list[MockReview]:
+    async def _get_users_by_id_for_top_comments(
+        self,
+        comments: list[Comment],
+    ) -> dict[int, User]:
+        top_comments = [c for c in comments if c.reply_to is None]
+        author_ids = sorted({c.user_id for c in top_comments})
+        if not author_ids:
+            return {}
+
+        async def _fetch(aid: int) -> tuple[int, User | None]:
+            try:
+                return aid, await self._get_user_service.execute(aid)
+            except UserNotFound:
+                return aid, None
+
+        fetched = await asyncio.gather(*(_fetch(aid) for aid in author_ids))
+        return {aid: u for aid, u in fetched if u is not None}
+
+    def _build_mock_reviews(
+        self,
+        comments: list[Comment],
+        users_by_id: dict[int, User],
+    ) -> list[MockReview]:
         comments_sorted = sorted(comments, key=lambda x: x.comment_id)
         reply_map = self._build_reply_map(comments_sorted)
         top_comments = [c for c in comments_sorted if c.reply_to is None]
@@ -220,6 +253,7 @@ class GenerateReviewsPdfService:
         for position, c in enumerate(top_comments, start=1):
             reply = reply_map.get(c.comment_id)
             developer_response = (reply.developer_response or "") if reply else ""
+            organization = users_by_id.get(c.user_id).organization if c.user_id in users_by_id else ""
 
             reviews.append(
                 MockReview(
@@ -228,10 +262,7 @@ class GenerateReviewsPdfService:
                         f"Раздел {position}. Требования к подсистеме диспетчеризации "
                         "перевозок опасных грузов"
                     ),
-                    organization=(
-                        f"ООО «Организация {position}» "
-                        f"(исх. № {100 + position} от {position:02d}.03.2026)"
-                    ),
+                    organization=organization,
                     remark=c.remark,
                     proposal=c.proposal,
                     justification=c.justification,
