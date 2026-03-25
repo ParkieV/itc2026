@@ -112,3 +112,5 @@ class InMemoryDocumentRepository:
             doc_id=document_id,
         )
         self._docs[str(document_id)] = asdict(patched)
+
+    def get_document_with_filters(self, document_id: int) -> list[Document]:
