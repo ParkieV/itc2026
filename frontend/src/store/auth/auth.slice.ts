@@ -16,7 +16,11 @@ export const authSlice = createSlice({
 		setToken: (state, action: PayloadAction<string>) => {
 			state.token = action.payload
 			cookies.set('token', action.payload, { expires: 1 / 24, secure: true })
-		}
+		},
+		clearToken: (state) => {
+			state.token = null
+			cookies.remove('token')
+		},
 	}
 })
 
