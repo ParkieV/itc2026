@@ -32,12 +32,11 @@ class MockReview:
 
 class GenerateReviewsPdfService:
     _FONT_NAME = "TimesNewRoman"
-    _FONTS_DIR = Path(__file__).resolve().parents[3] / "static" / "fonts"
     _FONT_PATHS = {
-        "normal": _FONTS_DIR / "Times New Roman.ttf",
-        "bold": _FONTS_DIR / "Times New Roman Bold.ttf",
-        "italic": _FONTS_DIR / "Times New Roman Italic.ttf",
-        "boldItalic": _FONTS_DIR / "Times New Roman Bold Italic.ttf",
+        "normal": "Times New Roman.ttf",
+        "bold": "Times New Roman Bold.ttf",
+        "italic": "Times New Roman Italic.ttf",
+        "boldItalic": "Times New Roman Bold Italic.ttf",
     }
 
     def __init__(
@@ -189,17 +188,20 @@ class GenerateReviewsPdfService:
         if self._FONT_NAME in pdfmetrics.getRegisteredFontNames():
             return
 
-        missing = [name for name, path in self._FONT_PATHS.items() if not path.exists()]
+        fonts_dir = self._get_fonts_dir()
+        font_paths = {name: fonts_dir / filename for name, filename in self._FONT_PATHS.items()}
+
+        missing = [name for name, path in font_paths.items() if not path.exists()]
         if missing:
             raise RuntimeError(
                 "Times New Roman fonts not found: " + ", ".join(missing)
             )
 
-        pdfmetrics.registerFont(TTFont(self._FONT_NAME, str(self._FONT_PATHS["normal"])))
-        pdfmetrics.registerFont(TTFont(f"{self._FONT_NAME}-Bold", str(self._FONT_PATHS["bold"])))
-        pdfmetrics.registerFont(TTFont(f"{self._FONT_NAME}-Italic", str(self._FONT_PATHS["italic"])))
+        pdfmetrics.registerFont(TTFont(self._FONT_NAME, str(font_paths["normal"])))
+        pdfmetrics.registerFont(TTFont(f"{self._FONT_NAME}-Bold", str(font_paths["bold"])))
+        pdfmetrics.registerFont(TTFont(f"{self._FONT_NAME}-Italic", str(font_paths["italic"])))
         pdfmetrics.registerFont(
-            TTFont(f"{self._FONT_NAME}-BoldItalic", str(self._FONT_PATHS["boldItalic"]))
+            TTFont(f"{self._FONT_NAME}-BoldItalic", str(font_paths["boldItalic"]))
         )
         pdfmetrics.registerFontFamily(
             self._FONT_NAME,
@@ -208,6 +210,18 @@ class GenerateReviewsPdfService:
             italic=f"{self._FONT_NAME}-Italic",
             boldItalic=f"{self._FONT_NAME}-BoldItalic",
         )
+
+    @staticmethod
+    def _get_fonts_dir() -> Path:
+        candidates = [
+            Path("/static/fonts"),
+            Path(__file__).resolve().parents[3] / "static" / "fonts",
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+
+        return candidates[0]
 
     @staticmethod
     def _build_reply_map(comments: list[Comment]) -> dict[int, Comment]:
