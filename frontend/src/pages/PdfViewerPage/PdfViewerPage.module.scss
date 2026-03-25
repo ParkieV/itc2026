@@ -201,9 +201,9 @@
 	height: 90px;
 	border: none;
 	cursor: pointer;
-	font-family: "InterDisplay";
+	font-family: "Roboto Mono", monospace;
 	font-size: 18px;
-	font-weight: 500;
+	font-weight: 400;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -216,7 +216,7 @@
 }
 
 .approveBtn {
-	background: #0b44ff;
+	background: #7595ff;
 }
 
 .declineBtn:disabled,
@@ -226,13 +226,15 @@
 }
 
 .declineIcon {
-	font-size: 24px;
-	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .approveIcon {
-	font-size: 22px;
-	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .panel {
