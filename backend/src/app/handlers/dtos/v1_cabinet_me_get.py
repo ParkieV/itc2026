@@ -5,6 +5,7 @@ class V1CabinetMeGetResponse(BaseModel):
     user_id: int
     fio: str
     login: str
+    organization: str
 
 
 class V1_CABINET_ME_GET_RESPONSE200(V1CabinetMeGetResponse):
