@@ -7,8 +7,10 @@ from utils.datetime_iso import now_iso_msk
 class InMemoryDocumentRepository:
     def __init__(self) -> None:
         now_iso = now_iso_msk()
-        self._docs = {
-            '1': {
+        # Similar structure to `InMemoryDocumentFilesRepository`:
+        # store documents in a dict keyed by `doc_id` and keep `_count` in sync.
+        self._docs_by_doc_id = {
+            1: {
                 "title": "test",
                 "description": "test description 1",
                 "file_id": 1,
@@ -18,7 +20,7 @@ class InMemoryDocumentRepository:
                 "created_at": now_iso,
                 "modified_at": now_iso,
             },
-            '2': {
+            2: {
                 "title": "test",
                 "description": "test description 2",
                 "file_id": 1,
@@ -28,7 +30,7 @@ class InMemoryDocumentRepository:
                 "created_at": now_iso,
                 "modified_at": now_iso,
             },
-            '3': {
+            3: {
                 "title": "test",
                 "description": "test description 3",
                 "file_id": 1,
@@ -39,7 +41,7 @@ class InMemoryDocumentRepository:
                 "modified_at": now_iso,
             },
         }
-        self._count = len(self._paths_by_file_id.keys()) + 1
+        self._count = len(self._docs_by_doc_id.keys()) + 1
 
     def _add_count(self) -> None:
         self._count += 1
@@ -51,17 +53,15 @@ class InMemoryDocumentRepository:
         created_at = document.created_at or now_iso_msk()
         modified_at = document.modified_at or created_at
 
-        # TODO: ПРОВЕРИТЬ
-        # Keep keys consistent with get_document() which looks up via `str(document_id)`.
-        self._docs[str(self._count)] = {
-          **asdict(document),
-          "created_at": created_at,
-          "modified_at": modified_at,
+        self._docs_by_doc_id[self._count] = {
+            **asdict(document),
+            "created_at": created_at,
+            "modified_at": modified_at,
         }
         self._add_count()
 
     def get_document(self, document_id: int) -> Document | None:
-        document_model = self._docs.get(str(document_id))
+        document_model = self._docs_by_doc_id.get(document_id)
 
         if document_model is None:
             return None
@@ -80,7 +80,7 @@ class InMemoryDocumentRepository:
 
     def get_list(self) -> list[Document]:
         out: list[Document] = []
-        for key, document_model in self._docs.items():
+        for doc_id, document_model in self._docs_by_doc_id.items():
             out.append(
                 Document(
                     title=document_model['title'],
@@ -91,13 +91,13 @@ class InMemoryDocumentRepository:
                     stage_id=document_model['stage_id'],
                     created_at=document_model['created_at'],
                     modified_at=document_model['modified_at'],
-                    doc_id=int(key),
+                    doc_id=doc_id,
                 )
             )
         return out
 
     def patch_document(self, document: Document, document_id: int) -> str:
-        existing = self._docs.get(str(document_id))
+        existing = self._docs_by_doc_id.get(document_id)
         if existing is None:
             raise ValueError(f'Document with id {document_id} does not exist')
 
@@ -112,4 +112,5 @@ class InMemoryDocumentRepository:
             pdf_file_id=document.pdf_file_id,
             doc_id=document_id,
         )
-        self._docs[str(document_id)] = asdict(patched)
+        self._docs_by_doc_id[document_id] = asdict(patched)
+        return str(document_id)
