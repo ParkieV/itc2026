@@ -20,6 +20,7 @@ class AsyncInMemoryUserRepository:
                     "organization": "Организация ООО Телеком",
                     "phone": "+79991234567",
                 },
+
                 {
                     "user_id": 2,
                     "login": "yarik",
