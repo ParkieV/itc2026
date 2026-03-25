@@ -11,8 +11,9 @@ class V1CabinetDocumentCommentAllResponse(BaseModel):
     stage_id: int
     author: CommentAuthorPreview
     reply_to: int | None = None
-    subject: str
-    content: str
+    remark: str
+    proposal: str | None = None
+    justification: str | None = None
     xfdf: str
     status: CommentStatus | None = None
     is_viewed: bool = False
