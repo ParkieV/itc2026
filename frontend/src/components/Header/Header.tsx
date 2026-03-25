@@ -29,15 +29,6 @@ export const Header: FC = () => {
 		navigate(`/${itemId}`);
 	};
 
-	const organizationName = useMemo(() => {
-		// ожидаемый формат URL: `/${orgName}/...`
-		const firstSeg = pathname.split('/').filter(Boolean)[0] ?? ''
-		const banned = new Set(['pdf', 'kanban', 'home'])
-		if (!firstSeg || banned.has(firstSeg.toLowerCase())) {
-			return '—'
-		}
-		return firstSeg
-	}, [pathname])
 
 	useEffect(() => {
 		if (!logoutOpen) {
@@ -90,7 +81,7 @@ export const Header: FC = () => {
 			<div ref={logoutRef} className={cls.profilePill} onClick={() => setLogoutOpen((v) => !v)} role="button" tabIndex={0}>
 				<span className={cls.profileDots}>⋮⋮</span>
 				<span className={cls.profileName}>
-					{profile?.fio ?? '—'} / {organizationName}
+					{profile?.fio ?? '—'} / {profile?.organization}
 				</span>
 				<Avatar className={cls.profileAvatar} size="md">
 					<Avatar.Fallback>

@@ -2,6 +2,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import WebViewer from '@pdftron/webviewer';
+import { ChecksIcon, RepeatIcon } from '@phosphor-icons/react';
 
 import type {
 	CommentStatus,
@@ -706,8 +707,8 @@ export const PdfViewerPage: FC = () => {
 		if (!docMeta) {
 			return;
 		}
-		// Кнопки approve/decline по макету доступны автору (viewerRole=developer).
-		if (viewerRole !== 'developer') {
+		// Кнопки approve/decline по макету доступны эксперту (viewerRole=expert).
+		if (viewerRole !== 'expert') {
 			return;
 		}
 		if (isReviewStatusLoading) {
@@ -931,18 +932,20 @@ export const PdfViewerPage: FC = () => {
 							<button
 								type="button"
 								className={cls.declineBtn}
-								disabled={ isReviewStatusLoading}
+								disabled={isReviewStatusLoading || myReviewStatus === 'declined'}
 								onClick={() => void handleReviewDecision('declined')}
 							>
-								отклонить <span className={cls.declineIcon}>×</span>
+								вернуться к рассмотрению{' '}
+								<RepeatIcon className={cls.declineIcon} size={28} weight="regular" />
 							</button>
 							<button
 								type="button"
 								className={cls.approveBtn}
-								disabled={isReviewStatusLoading}
+								disabled={isReviewStatusLoading || myReviewStatus === 'accepted'}
 								onClick={() => void handleReviewDecision('accepted')}
 							>
-								принять <span className={cls.approveIcon}>✓</span>
+								документ принят{' '}
+								<ChecksIcon className={cls.approveIcon} size={28} weight="regular" />
 							</button>
 						</div>
 					)}
