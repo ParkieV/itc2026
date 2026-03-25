@@ -44,9 +44,10 @@ class ChangeDocumentStageUseCase:
         except GetStageByIdStageNotFound as err:
             raise StageNotFound(str(err)) from err
 
-        if stage_id != current_stage.next_stage:
+        expected_next_stage = current_stage.next_stage
+        if expected_next_stage is None or stage_id != expected_next_stage:
             raise InvalidTargetStage(
-                f"Target stage {stage_id} is invalid: must be next_stage {current_stage.next_stage} "
+                f"Target stage {stage_id} is invalid: must be next_stage {expected_next_stage} "
                 f"for current stage {document.stage_id}",
             )
 

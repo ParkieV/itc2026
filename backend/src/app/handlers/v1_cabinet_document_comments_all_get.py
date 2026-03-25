@@ -54,17 +54,24 @@ async def _comment_to_response(
     try:
         u = await get_user_service.execute(c.user_id)
         fio = u.fio
+        organization = u.organization
+        phone = u.phone
+        email = u.email
     except UserNotFound:
         fio = ""
+        organization = ""
+        phone = ""
+        email = ""
     return V1CabinetDocumentCommentAllResponse(
         comment_id=c.comment_id,
         doc_id=c.doc_id,
         stage_id=c.stage_id,
-        author=CommentAuthorPreview(user_id=c.user_id, fio=fio),
+        author=CommentAuthorPreview(user_id=c.user_id, fio=fio, organization=organization, phone=phone, email=email),
         reply_to=c.reply_to,
         remark=c.remark,
         proposal=c.proposal,
         justification=c.justification,
+        developer_response=c.developer_response,
         xfdf=c.xfdf,
         status=c.status,
         is_viewed=c.is_viewed,

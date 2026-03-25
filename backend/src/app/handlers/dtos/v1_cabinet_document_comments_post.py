@@ -5,7 +5,7 @@ from entities.comment_status import CommentStatus
 
 class V1CabinetDocumentCreateCommentRequest(BaseModel):
     stage_id: int
-    remark: str
+    remark: str | None = None
     proposal: str | None = None
     justification: str | None = None
     xfdf: str
