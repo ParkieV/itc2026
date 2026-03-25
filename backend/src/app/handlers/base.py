@@ -10,6 +10,7 @@ from .v1_cabinet_document_get import router as v1_cabinet_document_get_router
 from .v1_cabinet_document_file_get import router as v1_cabinet_document_file_get_router
 from .v1_cabinet_document_pdf_file_get import router as v1_cabinet_document_pdf_file_get_router
 from .v1_cabinet_reviews_post import router as v1_cabinet_reviews_post_router
+from .v1_cabinet_reviews_pdf_post import router as v1_cabinet_reviews_pdf_post_router
 from .v1_cabinet_document_file_post import router as v1_cabinet_document_file_post_router
 from .v1_cabinet_stages_get import router as v1_cabinet_stages_get_router
 from .v1_user_notifications_post import router as v1_user_notifications_post_router
@@ -29,6 +30,7 @@ router.include_router(v1_cabinet_document_file_get_router)
 router.include_router(v1_cabinet_document_pdf_file_get_router)
 router.include_router(v1_cabinet_document_get_router)
 router.include_router(v1_cabinet_reviews_post_router)
+router.include_router(v1_cabinet_reviews_pdf_post_router)
 router.include_router(v1_cabinet_document_file_post_router)
 router.include_router(v1_cabinet_stages_get_router)
 router.include_router(v1_user_notifications_post_router)
