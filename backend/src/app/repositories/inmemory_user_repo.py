@@ -12,12 +12,12 @@ class AsyncInMemoryUserRepository:
             [
                 {
                     "user_id": 1,
-                    "login": "test_user",
+                    "login": "stepa",
                     "password": "password123",
                     "scope": "user",
-                    "fio": "Тестовый Пользователь",
+                    "fio": "Степан Пискунов",
                     "email": "quarioo@mail.ru",
-                    "organization": "Тестовая Организация",
+                    "organization": "Организация ООО Телеком",
                     "phone": "+79991234567",
                 },
                 {
@@ -25,21 +25,31 @@ class AsyncInMemoryUserRepository:
                     "login": "yarik",
                     "password": "password123",
                     "scope": "user",
-                    "fio": "Тестовый Пользователь",
+                    "fio": "Ярослав Сокин",
                     "email": "kinsoprod@yandex.ru",
-                    "organization": "Тестовая Организация 2",
+                    "organization": "Юридическая комисия",
                     "phone": "+79991234568",
                 },
                 {
                     "user_id": 3,
+                    "login": "nikita",
+                    "password": "password123",
+                    "scope": "user",
+                    "fio": "Никита Крылов",
+                    "email": "m2206041@edu.misis.ru",
+                    "organization": "Правительство Тульской области",
+                    "phone": "+79991234569",
+                },
+                {
+                    "user_id": 4,
                     "login": "timosha",
                     "password": "password123",
                     "scope": "user",
-                    "fio": "Тестовый Пользователь",
+                    "fio": "Костров Тимофей",
                     "email": "m2206041@edu.misis.ru",
-                    "organization": "Тестовая Организация 3",
+                    "organization": "Исполняющая организация",
                     "phone": "+79991234569",
-                },
+                }
             ]
         ).set_index(["user_id", "login"])
 
