@@ -19,12 +19,18 @@ class AsyncInMemoryStagesRepository:
     def stages(self) -> pd.DataFrame:
         return self._stages.copy()
 
+    @staticmethod
+    def _next_stage_value(v) -> int | None:
+        if v is None or pd.isna(v):
+            return None
+        return int(v)
+
     async def list_all(self) -> list[Stage]:
         df = self.stages.reset_index()
         return [
             Stage(
                 stage_id=int(row["stage_id"]),
-                next_stage=row["next_stage"],
+                next_stage=self._next_stage_value(row["next_stage"]),
                 title=str(row["title"]),
             )
             for _, row in df.iterrows()
@@ -38,6 +44,6 @@ class AsyncInMemoryStagesRepository:
 
         return Stage(
             stage_id=int(row.name),
-            next_stage=row["next_stage"],
+            next_stage=self._next_stage_value(row["next_stage"]),
             title=str(row["title"]),
         )
