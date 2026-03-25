@@ -24,7 +24,7 @@ class InMemoryDocumentFilesRepository:
                 "pdf_file_path": "src/static/pdfs/test3.pdf",
             },
         }
-        self._count = 4
+        self._count = len(self._paths_by_file_id.keys()) + 1
 
     def get_next_file_id(self) -> int:
         return self._count
