@@ -6,7 +6,7 @@
 	grid-template-columns: 1fr auto 1fr;
 	align-items: center;
 	gap: 16px;
-	padding: 16px 0 18px;
+	padding: 16px 24px 18px;
 }
 
 .searchPill {
@@ -28,6 +28,7 @@
 
 .searchText {
 	opacity: 0.9;
+	font-family: "Roboto Mono", monospace;
 }
 
 .searchShortcut {
@@ -51,9 +52,13 @@
 	background: rgba(27, 28, 30, 0.06);
 	color: #222b33;
 	font-size: 14px;
-	transition: border-radius 0.5s ease-in-out;
+
+	transition: border-radius 0.4s ease-in-out;
 	&:hover {
 		border-radius: 4px;
+	}
+	span {
+		font-family: 'Roboto Mono', monospace;
 	}
 }
 
@@ -85,6 +90,9 @@
 	border-radius: 999px;
 	background: rgba(27, 28, 30, 0.06);
 	color: #222b33;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
 }
 
 .profileDots {
@@ -96,30 +104,37 @@
 .profileName {
 	font-size: 14px;
 	white-space: nowrap;
+	font-family: "Roboto Mono", monospace;
 }
 
 .profileAvatar {
 	flex-shrink: 0;
 }
 
-@media (max-width: 1320px) {
-	.header {
-		grid-template-columns: 1fr;
-		gap: 10px;
-	}
+.logoutTooltip {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 1000;
+	min-width: 160px;
+	padding: 10px;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 20px 45px rgba(2, 6, 23, 0.18), 0 0 0 1px rgba(2, 6, 23, 0.06);
+}
 
-	.searchPill,
-	.nav,
-	.profilePill {
-		justify-self: stretch;
-	}
+.logoutBtn {
+	width: 100%;
+	padding: 10px 12px;
+	border-radius: 10px;
+	border: 1px solid rgba(226, 232, 240, 1);
+	background: #fff;
+	color: #0f172a;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
 
-	.nav {
-		overflow-x: auto;
-		padding-bottom: 2px;
-	}
-
-	.profilePill {
-		justify-content: space-between;
+	&:hover {
+		background: #f8fafc;
 	}
 }
