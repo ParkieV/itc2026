@@ -2,12 +2,14 @@ from pydantic import BaseModel, Field, RootModel
 
 from entities.comment_status import CommentStatus
 
+from .comment_author_preview import CommentAuthorPreview
+
 
 class V1CabinetDocumentCommentAllResponse(BaseModel):
     comment_id: int
     doc_id: int
     stage_id: int
-    user_id: int
+    author: CommentAuthorPreview
     reply_to: int | None = None
     subject: str
     content: str

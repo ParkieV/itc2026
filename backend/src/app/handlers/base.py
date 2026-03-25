@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-
 from .v1_auth_authenticate_post import router as v1_auth_authenticate_post_router
 from .v1_cabinet_document_move_post import router as v1_cabinet_document_move_post_router
 from .v1_cabinet_me_get import router as v1_cabinet_me_get_router
