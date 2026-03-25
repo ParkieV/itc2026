@@ -53,6 +53,7 @@ RUN useradd -u 10001 -m appuser
 COPY --from=builder /build/run/private_key.pem /run/private_key.pem
 COPY --from=builder /build/run/public_key.pem /run/public_key.pem
 COPY --from=builder /build/src/app /home/app
+COPY --from=builder /build/src/static /static
 COPY --from=builder /opt/venv/bin /opt/venv/bin
 COPY --from=builder /opt/venv/lib/python3.12/site-packages/ /opt/venv/lib
 
