@@ -75,6 +75,7 @@ async def _comment_to_response(c, get_user_service: GetUserService) -> V1Cabinet
         remark=c.remark,
         proposal=c.proposal,
         justification=c.justification,
+        developer_response=c.developer_response,
         xfdf=c.xfdf,
         status=c.status,
         is_viewed=c.is_viewed,
