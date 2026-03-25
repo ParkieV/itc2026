@@ -28,6 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --no-install-project --no-editable --compile-bytecode --link-mode=copy
 
 COPY src/app /build/src/app
+COPY src/static /build/src/static
 COPY run/private_key.pem /build/run/private_key.pem
 COPY run/public_key.pem /build/run/public_key.pem
 
