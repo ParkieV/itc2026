@@ -1,4 +1,5 @@
 from entities.document import Document
+from entities.review import Review
 from entities.review_status import ReviewStatus
 from repositories.inmemory_reviews_repo import AsyncInMemoryReviewsRepository
 from services.change_doc_stage.exceptions import (
@@ -83,3 +84,24 @@ class ChangeDocumentStageUseCase:
             doc_id=doc_id,
         )
         await self._change_document_stage_service.execute(doc_id, updated_document)
+
+        # After moving the document to a new stage, create reviews for all reviewers
+        # associated with the target stage (from the in-memory reviews storage).
+        # - doc_id/stage_id come from the updated document (the arguments to this usecase)
+        # - user_id comes from reviewers of the target stage
+        reviews_for_target_stage = await self._reviews_repo.get_all()
+        reviewer_ids = {r.user_id for r in reviews_for_target_stage if r.stage_id == stage_id}
+
+        existing_reviews = await self._reviews_repo.get_list_by_stage_and_doc(stage_id, doc_id)
+        existing_user_ids = {r.user_id for r in existing_reviews}
+
+        for reviewer_id in reviewer_ids - existing_user_ids:
+            await self._reviews_repo.add(
+                Review(
+                    stage_id=stage_id,
+                    doc_id=doc_id,
+                    user_id=reviewer_id,
+                    is_viewed=False,
+                    status=None,
+                )
+            )
