@@ -2,7 +2,23 @@ from pydantic import BaseModel, Field
 
 from entities.comment_status import CommentStatus
 
-from .v1_cabinett_document_comments import V1CabinettDocumentCommentResponse
+from .comment_author_preview import CommentAuthorPreview
+
+
+class V1CabinetDocumentsCommentPatchResponse(BaseModel):
+    comment_id: int
+    doc_id: int
+    stage_id: int
+    author: CommentAuthorPreview
+    reply_to: int | None = None
+    remark: str | None = None
+    proposal: str | None = None
+    justification: str | None = None
+    developer_response: str | None = None
+    xfdf: str
+    status: CommentStatus | None = None
+    is_viewed: bool = False
+    created_at: str
 
 
 class V1CabinetDocumentsCommentPatchRequest(BaseModel):
@@ -12,7 +28,7 @@ class V1CabinetDocumentsCommentPatchRequest(BaseModel):
     status: CommentStatus | None = None
 
 
-class V1_CABINET_DOCUMENTS_COMMENT_PATCH_RESPONSE200(V1CabinettDocumentCommentResponse):
+class V1_CABINET_DOCUMENTS_COMMENT_PATCH_RESPONSE200(V1CabinetDocumentsCommentPatchResponse):
     """Обновлённый комментарий."""
 
 

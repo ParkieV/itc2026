@@ -41,8 +41,10 @@ async def create_document_comment(
             doc_id=doc_id,
             stage_id=request.stage_id,
             user_id=int(user_id),
-            subject=request.subject,
-            content=request.content,
+            remark=request.remark,
+            proposal=request.proposal,
+            justification=request.justification,
+            developer_response=request.developer_response,
             xfdf=request.xfdf,
             reply_to=request.reply_to,
         )

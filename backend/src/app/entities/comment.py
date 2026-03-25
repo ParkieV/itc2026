@@ -9,10 +9,12 @@ class Comment:
     doc_id: int
     stage_id: int
     user_id: int
-    subject: str
-    content: str
     xfdf: str
     created_at: str
     reply_to: int | None = None
     status: CommentStatus | None = None
     is_viewed: bool = False
+    remark: str | None = None
+    proposal: str | None = None
+    justification: str | None = None
+    developer_response: str | None = None

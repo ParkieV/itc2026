@@ -10,7 +10,7 @@ from entities.document_user_status import DocumentUserStatus
 
 class StageGetResponse(BaseModel):
     stage_id: int
-    next_stage: int
+    next_stage: int | None
     title: str
     docs: list[Any] = field(default_factory=list)
     reviewers: list[Any] = field(default_factory=list)
@@ -18,7 +18,7 @@ class StageGetResponse(BaseModel):
 
 class StageSummaryGetResponse(BaseModel):
     stage_id: int
-    next_stage: int
+    next_stage: int | None
     title: str
 
 
@@ -27,11 +27,16 @@ class StageReviewerUserGetResponse(BaseModel):
     fio: str
 
 
+class UserPreview(BaseModel):
+    id: int
+    fio: str
+
+
 class DocumentGetResponse(BaseModel):
     doc_id: int
     title: str
     description: str
-    authors: list[int]
+    authors: list[UserPreview]
     created_at: str
     modified_at: str
     status: DocumentUserStatus | None = Field(

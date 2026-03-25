@@ -1,6 +1,8 @@
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Depends
 from handlers.dependencies.get_current_client_id import get_current_client_id
+from services.get_user.exceptions import UserNotFound
+from services.get_user.service import GetUserService
 from usecases.get_document_user_status.usecase import GetDocumentUserStatusUseCase
 from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithReviewerAndDocsUseCase
 from .dtos.helper import openapi_responses
@@ -8,12 +10,25 @@ from .dtos.v1_stages_list_get import (
     DocumentGetResponse,
     StageReviewerUserGetResponse,
     StageSummaryGetResponse,
+    UserPreview,
     V1_STAGES_LIST_GET_RESPONSE200,
     V1_STAGES_LIST_GET_RESPONSE401,
     V1StageWithReviewerAndDocsGetResponse,
 )
 
 router = APIRouter()
+
+
+async def _authors_as_preview(get_user_service: GetUserService, author_ids: list[int]) -> list[UserPreview]:
+    out: list[UserPreview] = []
+    for aid in author_ids:
+        try:
+            u = await get_user_service.execute(aid)
+        except UserNotFound:
+            out.append(UserPreview(id=aid, fio=""))
+        else:
+            out.append(UserPreview(id=aid, fio=u.fio))
+    return out
 
 
 @router.get(
@@ -29,6 +44,7 @@ router = APIRouter()
 async def list_stages(
     get_stages_with_reviewer_and_docs_uc: FromDishka[GetStagesWithReviewerAndDocsUseCase],
     get_document_user_status_uc: FromDishka[GetDocumentUserStatusUseCase],
+    get_user_service: FromDishka[GetUserService],
     user_id: str = Depends(get_current_client_id),
 ) -> list[V1StageWithReviewerAndDocsGetResponse]:
     stages = await get_stages_with_reviewer_and_docs_uc.execute()
@@ -45,7 +61,7 @@ async def list_stages(
                     doc_id=d.doc_id,
                     title=d.title,
                     description=d.description,
-                    authors=d.authors,
+                    authors=await _authors_as_preview(get_user_service, d.authors),
                     created_at=d.created_at or "",
                     modified_at=d.modified_at or "",
                     status=await get_document_user_status_uc.status_for_user(d.doc_id, uid)

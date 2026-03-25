@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from entities.document_user_status import DocumentUserStatus
 from entities.review_status import ReviewStatus
 
-from handlers.dtos.v1_cabinett_document_comments import V1CabinettDocumentCommentResponse
+from handlers.dtos.v1_cabinet_document_comments_get import V1CabinetDocumentCommentResponse
 
 
 class V1CabinetDocumentGetDocumentResponse(BaseModel):
@@ -32,7 +32,7 @@ class V1CabinetDocumentGetReviewResponse(BaseModel):
 class V1CabinetDocumentGetResponse(BaseModel):
     document: V1CabinetDocumentGetDocumentResponse
     reviews: list[V1CabinetDocumentGetReviewResponse]
-    comments: list[V1CabinettDocumentCommentResponse] = Field(
+    comments: list[V1CabinetDocumentCommentResponse] = Field(
         description="Комментарии к документу на текущем этапе (doc_id и stage_id документа).",
     )
 

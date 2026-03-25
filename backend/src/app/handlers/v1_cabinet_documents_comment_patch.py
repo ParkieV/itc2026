@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from handlers.dependencies.get_current_client_id import get_current_client_id
 from services.comment_exceptions import CommentNotFound
 from services.get_pdf_document.exceptions import DocumentNotFound
+from services.get_user.exceptions import UserNotFound
+from services.get_user.service import GetUserService
 from services.patch_comment.service import PatchCommentService
 from .dtos.helper import openapi_responses
 from .dtos.v1_cabinet_documents_comment_patch import (
@@ -13,25 +15,10 @@ from .dtos.v1_cabinet_documents_comment_patch import (
     V1_CABINET_DOCUMENTS_COMMENT_PATCH_RESPONSE404,
     V1CabinetDocumentsCommentPatchRequest,
 )
-from .dtos.v1_cabinett_document_comments import V1CabinettDocumentCommentResponse
+from .dtos.v1_cabinet_documents_comment_patch import V1CabinetDocumentsCommentPatchResponse
+from .dtos.comment_author_preview import CommentAuthorPreview
 
 router = APIRouter()
-
-
-def _comment_to_response(c) -> V1CabinettDocumentCommentResponse:
-    return V1CabinettDocumentCommentResponse(
-        comment_id=c.comment_id,
-        doc_id=c.doc_id,
-        stage_id=c.stage_id,
-        user_id=c.user_id,
-        reply_to=c.reply_to,
-        subject=c.subject,
-        content=c.content,
-        xfdf=c.xfdf,
-        status=c.status,
-        is_viewed=c.is_viewed,
-        created_at=c.created_at,
-    )
 
 
 @router.patch(
@@ -50,8 +37,9 @@ async def patch_document_comment(
     comment_id: int,
     request: V1CabinetDocumentsCommentPatchRequest,
     patch_comment_service: FromDishka[PatchCommentService],
+    get_user_service: FromDishka[GetUserService],
     _: str = Depends(get_current_client_id),
-) -> V1CabinettDocumentCommentResponse:
+) -> V1CabinetDocumentsCommentPatchResponse:
     try:
         updated = await patch_comment_service.execute(
             doc_id,
@@ -63,4 +51,33 @@ async def patch_document_comment(
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
     except CommentNotFound as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
-    return _comment_to_response(updated)
+    return await _comment_to_response(updated, get_user_service)
+
+
+async def _comment_to_response(c, get_user_service: GetUserService) -> V1CabinetDocumentsCommentPatchResponse:
+    try:
+        u = await get_user_service.execute(c.user_id)
+        fio = u.fio
+        organization = u.organization
+        phone = u.phone
+        email = u.email
+    except UserNotFound:
+        fio = ""
+        organization = ""
+        phone = ""
+        email = ""
+    return V1CabinetDocumentsCommentPatchResponse(
+        comment_id=c.comment_id,
+        doc_id=c.doc_id,
+        stage_id=c.stage_id,
+        author=CommentAuthorPreview(user_id=c.user_id, fio=fio, organization=organization, phone=phone, email=email),
+        reply_to=c.reply_to,
+        remark=c.remark,
+        proposal=c.proposal,
+        justification=c.justification,
+        developer_response=c.developer_response,
+        xfdf=c.xfdf,
+        status=c.status,
+        is_viewed=c.is_viewed,
+        created_at=c.created_at,
+    )

@@ -6,6 +6,9 @@ from handlers.dependencies.get_current_client_id import get_current_client_id
 from services.get_comments_by_doc.service import GetCommentsByDocService
 from services.get_pdf_document.exceptions import DocumentNotFound
 from services.get_stage_by_id.exceptions import StageNotFound
+from services.get_user.exceptions import UserNotFound
+from services.get_user.service import GetUserService
+from .dtos.comment_author_preview import CommentAuthorPreview
 from .dtos.helper import openapi_responses
 from .dtos.v1_cabinet_document_comments_all_get import (
     V1_CABINET_DOCUMENT_COMMENTS_ALL_GET_RESPONSE200,
@@ -31,6 +34,7 @@ router = APIRouter()
 async def get_document_comments_all(
     doc_id: int,
     get_comments_by_doc_service: FromDishka[GetCommentsByDocService],
+    get_user_service: FromDishka[GetUserService],
     _: str = Depends(get_current_client_id),
 ) -> list[V1CabinetDocumentCommentAllResponse]:
     try:
@@ -38,19 +42,38 @@ async def get_document_comments_all(
     except (DocumentNotFound, StageNotFound) as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
 
-    return [_comment_to_response(i) for i in comments]
+    out: list[V1CabinetDocumentCommentAllResponse] = []
+    for c in comments:
+        out.append(await _comment_to_response(c, get_user_service))
+    return out
 
-def _comment_to_response(i) -> V1CabinetDocumentCommentAllResponse:
+
+async def _comment_to_response(
+    c, get_user_service: GetUserService
+) -> V1CabinetDocumentCommentAllResponse:
+    try:
+        u = await get_user_service.execute(c.user_id)
+        fio = u.fio
+        organization = u.organization
+        phone = u.phone
+        email = u.email
+    except UserNotFound:
+        fio = ""
+        organization = ""
+        phone = ""
+        email = ""
     return V1CabinetDocumentCommentAllResponse(
-        comment_id=i.comment_id,
-        doc_id=i.doc_id,
-        stage_id=i.stage_id,
-        user_id=i.user_id,
-        reply_to=i.reply_to,
-        subject=i.subject,
-        content=i.content,
-        xfdf=i.xfdf,
-        status=i.status,
-        is_viewed=i.is_viewed,
-        created_at=i.created_at,
+        comment_id=c.comment_id,
+        doc_id=c.doc_id,
+        stage_id=c.stage_id,
+        author=CommentAuthorPreview(user_id=c.user_id, fio=fio, organization=organization, phone=phone, email=email),
+        reply_to=c.reply_to,
+        remark=c.remark,
+        proposal=c.proposal,
+        justification=c.justification,
+        developer_response=c.developer_response,
+        xfdf=c.xfdf,
+        status=c.status,
+        is_viewed=c.is_viewed,
+        created_at=c.created_at,
     )

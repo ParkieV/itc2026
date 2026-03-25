@@ -6,7 +6,7 @@ class IssueAccessTokenService:
         self.jwt_provider = jwt_provider
 
     def execute(self, subject: str, scope: str) -> AccessToken:
-        expires = datetime.now(tz=UTC) + timedelta(minutes=15)
+        expires = datetime.now(tz=UTC) + timedelta(hours=2)
         token = self.jwt_provider.encode(
             sub=subject,
             scope=scope,

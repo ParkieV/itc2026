@@ -28,6 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --no-install-project --no-editable --compile-bytecode --link-mode=copy
 
 COPY src/app /build/src/app
+COPY src/static /build/src/static
 COPY run/private_key.pem /build/run/private_key.pem
 COPY run/public_key.pem /build/run/public_key.pem
 
@@ -53,6 +54,7 @@ RUN useradd -u 10001 -m appuser
 COPY --from=builder /build/run/private_key.pem /run/private_key.pem
 COPY --from=builder /build/run/public_key.pem /run/public_key.pem
 COPY --from=builder /build/src/app /home/app
+COPY --from=builder /build/src/static /static
 COPY --from=builder /opt/venv/bin /opt/venv/bin
 COPY --from=builder /opt/venv/lib/python3.12/site-packages/ /opt/venv/lib
 

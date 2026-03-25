@@ -14,9 +14,17 @@ class InMemoryDocumentFilesRepository:
             1: {
                 "origin_file_path": "src/static/origins/test.docx",
                 "pdf_file_path": "src/static/pdfs/test.pdf",
-            }
+            },
+            2: {
+                "origin_file_path": "src/static/origins/test2.docx",
+                "pdf_file_path": "src/static/pdfs/test2.pdf",
+            },
+            3: {
+                "origin_file_path": "src/static/origins/test3.docx",
+                "pdf_file_path": "src/static/pdfs/test3.pdf",
+            },
         }
-        self._count = 1
+        self._count = len(self._paths_by_file_id.keys()) + 1
 
     def get_next_file_id(self) -> int:
         return self._count
@@ -54,16 +62,16 @@ class InMemoryDocumentFilesRepository:
         pdf_file_path: str | None = None,
     ) -> None:
         current = self._paths_by_file_id.get(
-            str(file_id),
+            file_id,
             {"origin_file_path": None, "pdf_file_path": None},
         )
         if origin_file_path is not None:
             current["origin_file_path"] = origin_file_path
         if pdf_file_path is not None:
             current["pdf_file_path"] = pdf_file_path
-        self._paths_by_file_id[str(file_id)] = current
+        self._paths_by_file_id[file_id] = current
         if file_id >= self._count:
             self._add_count()
 
     def get_paths(self, file_id: int) -> dict[str, str | None] | None:
-        return self._paths_by_file_id.get(str(file_id))
+        return self._paths_by_file_id.get(file_id)
