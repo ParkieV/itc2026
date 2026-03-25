@@ -24,7 +24,7 @@ class AsyncInMemoryStagesRepository:
         return [
             Stage(
                 stage_id=int(row["stage_id"]),
-                next_stage=int(row["next_stage"]),
+                next_stage=row["next_stage"],
                 title=str(row["title"]),
             )
             for _, row in df.iterrows()
@@ -38,6 +38,6 @@ class AsyncInMemoryStagesRepository:
 
         return Stage(
             stage_id=int(row.name),
-            next_stage=int(row["next_stage"]),
+            next_stage=row["next_stage"],
             title=str(row["title"]),
         )
