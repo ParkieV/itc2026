@@ -1,5 +1,8 @@
+from typing import Literal
+
 from dishka.integrations.fastapi import FromDishka, inject
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+
 from handlers.dependencies.get_current_client_id import get_current_client_id
 from services.get_user.exceptions import UserNotFound
 from services.get_user.service import GetUserService
@@ -16,20 +19,8 @@ from .dtos.v1_stages_list_get import (
     V1StageWithReviewerAndDocsGetResponse,
 )
 
+
 router = APIRouter()
-
-
-async def _authors_as_preview(get_user_service: GetUserService, author_ids: list[int]) -> list[UserPreview]:
-    out: list[UserPreview] = []
-    for aid in author_ids:
-        try:
-            u = await get_user_service.execute(aid)
-        except UserNotFound:
-            out.append(UserPreview(id=aid, fio=""))
-        else:
-            out.append(UserPreview(id=aid, fio=u.fio))
-    return out
-
 
 @router.get(
     "/v1/cabinet/stages",
@@ -46,9 +37,22 @@ async def list_stages(
     get_document_user_status_uc: FromDishka[GetDocumentUserStatusUseCase],
     get_user_service: FromDishka[GetUserService],
     user_id: str = Depends(get_current_client_id),
+    roles: list[Literal['author', 'reviewer']] | None = Query(default=None),
+    review_statuses: list[Literal['accepted', 'declined']] | None = Query(default=None),
+    categories: list[str] | None = Query(default=None),
+    doc_statuses: list[
+        Literal['new_comment', 'not_viewed', 'viewed', 'waiting', 'action_required', 'sent']
+    ] | None = Query(default=None),
 ) -> list[V1StageWithReviewerAndDocsGetResponse]:
-    stages = await get_stages_with_reviewer_and_docs_uc.execute()
     uid = int(user_id)
+
+    stages = await get_stages_with_reviewer_and_docs_uc.execute(
+        author_id=uid,
+        roles=roles,
+        review_statuses=review_statuses,
+        categories=categories,
+        doc_statuses=doc_statuses,
+    )
     return [
         V1StageWithReviewerAndDocsGetResponse(
             stage=StageSummaryGetResponse(
@@ -81,3 +85,13 @@ async def list_stages(
         for row in stages
     ]
 
+async def _authors_as_preview(get_user_service: GetUserService, author_ids: list[int]) -> list[UserPreview]:
+    out: list[UserPreview] = []
+    for aid in author_ids:
+        try:
+            u = await get_user_service.execute(aid)
+        except UserNotFound:
+            out.append(UserPreview(id=aid, fio=""))
+        else:
+            out.append(UserPreview(id=aid, fio=u.fio))
+    return out
