@@ -10,6 +10,7 @@ import '@store/api/documents.api'
 import '@store/api/user.api'
 import '@store/api/template.api'
 import '@store/api/comments.api'
+import '@store/api/notifications.api'
 
 const reducers = combineReducers({
 	auth: authReducer,

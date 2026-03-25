@@ -2,7 +2,6 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import WebViewer from '@pdftron/webviewer';
-import { ChecksIcon, RepeatIcon } from '@phosphor-icons/react';
 
 import type {
 	CommentStatus,
@@ -124,24 +123,24 @@ export const PdfViewerPage: FC = () => {
 		setMyReviewStatus(null);
 
 		const setup = async (): Promise<void> => {
-				let pdfUrl: string;
+			let pdfUrl: string;
 			let serverComments: V1CabinetDocumentCommentResponse[];
 			let resolvedViewerRole: ViewerRole;
 			try {
 				const [pdf, cabinetDoc, me] = await Promise.all([
 					store
-							.dispatch(
-								cabinetApi.endpoints.getCabinetDocumentPdf.initiate(docIdNum, {
-									forceRefetch: true,
-								})
-							)
+						.dispatch(
+							cabinetApi.endpoints.getCabinetDocumentPdf.initiate(docIdNum, {
+								forceRefetch: true,
+							})
+						)
 						.unwrap(),
 					store
 						.dispatch(cabinetApi.endpoints.getCabinetDocument.initiate(docIdNum))
 						.unwrap(),
 					store.dispatch(cabinetApi.endpoints.getCabinetMe.initiate()).unwrap(),
 				]);
-					pdfUrl = pdf;
+				pdfUrl = pdf;
 				cabinetStageIdRef.current = cabinetDoc.document.stage_id;
 				serverComments = cabinetDoc.comments ?? [];
 				if (mounted) {
@@ -158,6 +157,22 @@ export const PdfViewerPage: FC = () => {
 				if (mounted) {
 					setViewerRole(resolvedViewerRole);
 				}
+
+				// Эксперт при входе на страницу документа должен отметить review как "просмотренный".
+				if (resolvedViewerRole === 'expert') {
+					try {
+						await store
+							.dispatch(
+								cabinetApi.endpoints.viewCabinetReviews.initiate({
+									docId: docIdNum,
+									stageId: cabinetDoc.document.stage_id,
+								})
+							)
+							.unwrap();
+					} catch {
+						// Не блокируем открытие просмотрщика при проблемах с отметкой просмотра.
+					}
+				}
 			} catch {
 				if (mounted) {
 					setLoadError(
@@ -171,7 +186,7 @@ export const PdfViewerPage: FC = () => {
 				return;
 			}
 
-				pdfObjectUrl = pdfUrl;
+			pdfObjectUrl = pdfUrl;
 			if (!mounted) {
 				URL.revokeObjectURL(pdfObjectUrl);
 				pdfObjectUrl = null;
@@ -370,7 +385,8 @@ export const PdfViewerPage: FC = () => {
 								const parentAnnot = all.find(
 									(a: any) => String(a.Id) === String(parentAnnotIdRaw)
 								);
-								const parentCommentIdRaw = parentAnnot?.getCustomData?.(SERVER_COMMENT_ID_KEY);
+								const parentCommentIdRaw =
+									parentAnnot?.getCustomData?.(SERVER_COMMENT_ID_KEY);
 								if (!parentCommentIdRaw) {
 									continue;
 								}
@@ -382,15 +398,15 @@ export const PdfViewerPage: FC = () => {
 									continue;
 								}
 
-								const annotKey = String(annot.Id)
+								const annotKey = String(annot.Id);
 								if (pendingDeveloperReplyPostsRef.current.has(annotKey)) {
-									continue
+									continue;
 								}
-								pendingDeveloperReplyPostsRef.current.add(annotKey)
+								pendingDeveloperReplyPostsRef.current.add(annotKey);
 
 								const stageId = cabinetStageIdRef.current;
 								if (!stageId) {
-									pendingDeveloperReplyPostsRef.current.delete(annotKey)
+									pendingDeveloperReplyPostsRef.current.delete(annotKey);
 									continue;
 								}
 								try {
@@ -402,34 +418,45 @@ export const PdfViewerPage: FC = () => {
 									});
 									await store
 										.dispatch(
-											cabinetApi.endpoints.createCabinetDocumentComment.initiate({
-												docId: docIdNum,
-												body: {
-													stage_id: stageId,
-													developer_response: responseText,
-													reply_to: replyToCommentId,
-													xfdf,
-												},
-											}),
+											cabinetApi.endpoints.createCabinetDocumentComment.initiate(
+												{
+													docId: docIdNum,
+													body: {
+														stage_id: stageId,
+														developer_response: responseText,
+														reply_to: replyToCommentId,
+														xfdf,
+													},
+												}
+											)
 										)
 										.unwrap();
 
 									const refreshed = await store
 										.dispatch(
-											cabinetApi.endpoints.getCabinetDocument.initiate(docIdNum, {
-												forceRefetch: true,
-											}),
+											cabinetApi.endpoints.getCabinetDocument.initiate(
+												docIdNum,
+												{
+													forceRefetch: true,
+												}
+											)
 										)
 										.unwrap();
 
 									const xfdfNorm = xfdf.trim();
 									const match = refreshed.comments.find(
-										(c) => c.xfdf.trim() === xfdfNorm,
+										(c) => c.xfdf.trim() === xfdfNorm
 									);
 									if (match) {
 										try {
-											annot.setCustomData(SERVER_COMMENT_ID_KEY, String(match.comment_id));
-											if (typeof match.author?.fio === 'string' && match.author.fio.trim().length > 0) {
+											annot.setCustomData(
+												SERVER_COMMENT_ID_KEY,
+												String(match.comment_id)
+											);
+											if (
+												typeof match.author?.fio === 'string' &&
+												match.author.fio.trim().length > 0
+											) {
 												annot.Author = match.author.fio.trim();
 											}
 											annotManager.updateAnnotation(annot);
@@ -437,15 +464,21 @@ export const PdfViewerPage: FC = () => {
 											// ignore
 										}
 										if (match.status === 'accepted') {
-											lastSyncedStatusRef.current.set(match.comment_id, 'accepted');
+											lastSyncedStatusRef.current.set(
+												match.comment_id,
+												'accepted'
+											);
 										} else if (match.status === 'declined') {
-											lastSyncedStatusRef.current.set(match.comment_id, 'declined');
+											lastSyncedStatusRef.current.set(
+												match.comment_id,
+												'declined'
+											);
 										}
 									}
 								} catch {
 									// ignore network errors; next persist attempt can retry
 								} finally {
-									pendingDeveloperReplyPostsRef.current.delete(annotKey)
+									pendingDeveloperReplyPostsRef.current.delete(annotKey);
 								}
 							}
 						}
@@ -569,7 +602,10 @@ export const PdfViewerPage: FC = () => {
 								a.setCustomData(SERVER_COMMENT_ID_KEY, String(c.comment_id));
 
 								// Чтобы в панели комментариев WebViewer отображал автора, а не "Guest".
-								if (typeof c.author?.fio === 'string' && c.author.fio.trim().length > 0) {
+								if (
+									typeof c.author?.fio === 'string' &&
+									c.author.fio.trim().length > 0
+								) {
 									a.Author = c.author.fio.trim();
 								}
 							} catch {
@@ -705,13 +741,16 @@ export const PdfViewerPage: FC = () => {
 
 	const handleReviewDecision = async (status: ReviewStatus): Promise<void> => {
 		if (!docMeta) {
+			console.log('docMeta not found');
 			return;
 		}
-		// Кнопки approve/decline по макету доступны эксперту (viewerRole=expert).
-		if (viewerRole !== 'expert') {
+		// Кнопки approve/decline по макету доступны автору (viewerRole=developer).
+		if (viewerRole === 'developer') {
+			console.log('viewerRole not developer');
 			return;
 		}
 		if (isReviewStatusLoading) {
+			console.log('isReviewStatusLoading');
 			return;
 		}
 		try {
@@ -723,6 +762,45 @@ export const PdfViewerPage: FC = () => {
 			setMyReviewStatus(status);
 		} catch {
 			// Ошибки не прерываем: пользователь может попробовать ещё раз.
+		}
+	};
+
+	const handleReturnToReview = async (): Promise<void> => {
+		if (!docMeta) {
+			return;
+		}
+
+		// Оптимистично возвращаем UI в исходное состояние.
+		setMyReviewStatus(null);
+
+		try {
+			// В контракте `status` типа `ReviewStatus`, но на бэке возврат к рассмотрению
+			// может поддерживаться через `null`. Если бэк не примет — просто оставим UI-выбор.
+			await store
+				.dispatch(
+					cabinetApi.endpoints.setCabinetReviewStatus.initiate({
+						docId: docIdNum,
+						stageId: docMeta.stage_id,
+						status: null as unknown as ReviewStatus,
+					}) as any
+				)
+				.unwrap();
+
+			const refreshed = await store
+				.dispatch(
+					cabinetApi.endpoints.getCabinetDocument.initiate(docIdNum, {
+						forceRefetch: true,
+					})
+				)
+				.unwrap();
+
+			if (meProfile?.user_id != null) {
+				const nextMyReview =
+					refreshed.reviews?.find((r) => r.user_id === meProfile.user_id) ?? null;
+				setMyReviewStatus(nextMyReview?.status ?? null);
+			}
+		} catch {
+			// не ломаем UI
 		}
 	};
 
@@ -772,7 +850,10 @@ export const PdfViewerPage: FC = () => {
 			if (match) {
 				try {
 					annot.setCustomData(SERVER_COMMENT_ID_KEY, String(match.comment_id));
-					if (typeof match.author?.fio === 'string' && match.author.fio.trim().length > 0) {
+					if (
+						typeof match.author?.fio === 'string' &&
+						match.author.fio.trim().length > 0
+					) {
 						annot.Author = match.author.fio.trim();
 					}
 					annotManagerInstance.updateAnnotation(annot);
@@ -927,28 +1008,45 @@ export const PdfViewerPage: FC = () => {
 						</div>
 					</div>
 
-					{viewerRole === 'expert' && (
+					{viewerRole === 'expert' &&
+					(myReviewStatus === 'accepted' || myReviewStatus === 'declined') ? (
+						<div className={cls.bottomActions}>
+							<button
+								type="button"
+								className={cls.returnToReviewBtn}
+								disabled={isReviewStatusLoading}
+								onClick={() => void handleReturnToReview()}
+							>
+								вернуться к рассмотрению{' '}
+								<span className={cls.returnToReviewIcon}>⟳</span>
+							</button>
+							<div className={cls.decisionBtn} role="status" aria-live="polite">
+								{myReviewStatus === 'accepted'
+									? 'документ принят'
+									: 'документ отклонен'}{' '}
+								<span className={cls.decisionIcon}>✓</span>
+							</div>
+						</div>
+					) : viewerRole === 'expert' ? (
 						<div className={cls.bottomActions}>
 							<button
 								type="button"
 								className={cls.declineBtn}
-								disabled={isReviewStatusLoading || myReviewStatus === 'declined'}
+								disabled={isReviewStatusLoading}
 								onClick={() => void handleReviewDecision('declined')}
 							>
-								вернуться к рассмотрению{' '}
-								<RepeatIcon className={cls.declineIcon} size={28} weight="regular" />
+								отклонить <span className={cls.declineIcon}>×</span>
 							</button>
 							<button
 								type="button"
 								className={cls.approveBtn}
-								disabled={isReviewStatusLoading || myReviewStatus === 'accepted'}
+								disabled={isReviewStatusLoading}
 								onClick={() => void handleReviewDecision('accepted')}
 							>
-								документ принят{' '}
-								<ChecksIcon className={cls.approveIcon} size={28} weight="regular" />
+								принять <span className={cls.approveIcon}>✓</span>
 							</button>
 						</div>
-					)}
+					) : null}
 				</div>
 			)}
 

@@ -63,9 +63,34 @@ export type DocumentUserStatus =
 	| 'new_comment'
 	| 'not_viewed'
 	| 'viewed'
+	| 'waiting'
 	| 'action_required'
 	| 'sent'
 	| 'edits_required';
+
+/** GET /v1/cabinet/stages query params (для модалки фильтров). */
+export type CabinetStageRoleFilter = 'author' | 'coauthor' | 'reviewer';
+export type CabinetDocStatusFilter = 'new_comment' | 'not_viewed' | 'viewed' | 'waiting' | 'action_required' | 'sent';
+export type CabinetStagesStageIndex = 0 | 1 | 2 | 3;
+
+export interface V1StagesListQueryParams {
+	roles?: Array<'author' | 'reviewer'> | null;
+	review_statuses?: Array<'accepted' | 'declined'> | null;
+	categories?: string[] | null;
+	doc_statuses?: CabinetDocStatusFilter[] | null;
+}
+
+/** Состав фильтров, который хранит UI. */
+export interface CabinetStagesFilters {
+	/** UI-роль (Автор/Соавтор/Эксперт). В запрос это преобразуем в `roles`. */
+	myRole: CabinetStageRoleFilter[];
+	/** Стадии доски (клиентская фильтрация колонок). */
+	stageVerification: CabinetStagesStageIndex[];
+	/** Фильтр по статусам документа (серверная фильтрация через `doc_statuses`). */
+	docStatuses: CabinetDocStatusFilter[];
+	/** Категории документа (серверная фильтрация через `categories`). */
+	categories: string[];
+}
 
 export interface DocumentGetResponse {
 	doc_id: number;
@@ -158,6 +183,20 @@ export type V1StagesListGetResponse200 = V1StageWithReviewerAndDocsGetResponse[]
 export interface V1ChangeDocStagePostRequest {
 	doc_id: number;
 	stage_id: number;
+}
+
+/** GET /v1/cabinet/notifications/unread */
+export interface V1CabinetNotificationUnreadItem {
+	id: number;
+	event_type: string;
+	title: string;
+	body: string;
+	payload: Record<string, unknown>;
+	created_at: number;
+}
+
+export interface V1CabinetNotificationsUnreadGetResponse {
+	items: V1CabinetNotificationUnreadItem[];
 }
 
 export interface TUser {

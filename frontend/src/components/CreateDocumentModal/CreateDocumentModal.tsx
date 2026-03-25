@@ -26,9 +26,8 @@ import {
 	AVATAR_SEARCH_3,
 	AVATAR_VICTOR_CHIP,
 	DOC_PREVIEW_PLACEHOLDER,
-	SUCCESS_GLOW,
-	SUCCESS_ILLUSTRATION,
 } from './assets';
+import successImage from '@assets/img/success.png';
 
 export interface Coauthor {
 	id: string;
@@ -107,10 +106,7 @@ export interface CreateDocumentModalProps {
 	onClose: () => void;
 }
 
-export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
-	isOpen,
-	onClose,
-}) => {
+export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({ isOpen, onClose }) => {
 	const uid = useId();
 	const panelRef = useRef<HTMLDivElement>(null);
 	const successOkRef = useRef<HTMLButtonElement>(null);
@@ -145,23 +141,18 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 	}, []);
 
 	const hasFile = Boolean(file || previewUrl);
-	const titleDescFilled =
-		Boolean(title.trim()) && Boolean(description.trim());
+	const titleDescFilled = Boolean(title.trim()) && Boolean(description.trim());
 	const showPreviewShortcut = hasFile;
 	const useBodyTypoForFields = titleDescFilled;
 
 	const filteredSearch = useMemo(() => {
-		const base = SEARCH_CANDIDATES.filter(
-			(c) => c.userId !== meProfile?.user_id
-		);
+		const base = SEARCH_CANDIDATES.filter((c) => c.userId !== meProfile?.user_id);
 		const q = searchQuery.trim().toLowerCase();
 		if (!q) {
 			return base;
 		}
 		return base.filter(
-			(c) =>
-				c.name.toLowerCase().includes(q) ||
-				(c.email?.toLowerCase().includes(q) ?? false)
+			(c) => c.name.toLowerCase().includes(q) || (c.email?.toLowerCase().includes(q) ?? false)
 		);
 	}, [searchQuery, meProfile?.user_id]);
 
@@ -176,11 +167,7 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 		return [coauthorFromMe(meProfile), ...coauthors];
 	}, [meProfile, coauthors]);
 
-	const canSubmit =
-		hasFile &&
-		titleDescFilled &&
-		Boolean(meProfile) &&
-		Boolean(file);
+	const canSubmit = hasFile && titleDescFilled && Boolean(meProfile) && Boolean(file);
 
 	const resetForm = useCallback((): void => {
 		setSubmitSuccess(false);
@@ -272,8 +259,7 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 			};
 
 			document.addEventListener('mousedown', onDocMouseDown);
-			removeListener = (): void =>
-				document.removeEventListener('mousedown', onDocMouseDown);
+			removeListener = (): void => document.removeEventListener('mousedown', onDocMouseDown);
 		});
 
 		return (): void => {
@@ -347,20 +333,15 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 			if (prev.some((c) => c.id === person.id || c.userId === person.userId)) {
 				return prev;
 			}
-		
+
 			const inserted: Coauthor = {
 				id: person.id,
 				userId: person.userId,
 				name: person.name,
 				email: person.email ?? 'petr@gmail.com',
-				avatarUrl:
-					person.id === 'vasilyev-viktor'
-						? AVATAR_VICTOR_CHIP
-						: person.avatarUrl,
+				avatarUrl: person.id === 'vasilyev-viktor' ? AVATAR_VICTOR_CHIP : person.avatarUrl,
 			};
-			return [inserted, ...prev].filter(
-				(x): x is Coauthor => x != null
-			);
+			return [inserted, ...prev].filter((x): x is Coauthor => x != null);
 		});
 		setIsSearchOpen(false);
 	};
@@ -374,23 +355,11 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 	const renderPreviewContent = (): ReactElement => {
 		if (previewUrl && previewIsImage) {
 			return (
-				<img
-					className={cls.thumbImg}
-					src={previewUrl}
-					alt=""
-					width={187}
-					height={256}
-				/>
+				<img className={cls.thumbImg} src={previewUrl} alt="" width={187} height={256} />
 			);
 		}
 		if (previewUrl && file?.type === 'application/pdf') {
-			return (
-				<iframe
-					className={cls.thumbIframe}
-					title="предпросмотр"
-					src={previewUrl}
-				/>
-			);
+			return <iframe className={cls.thumbIframe} title="предпросмотр" src={previewUrl} />;
 		}
 		return (
 			<img
@@ -404,11 +373,7 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 	};
 
 	return createPortal(
-		<div
-			className={cls.overlay}
-			role="presentation"
-			onMouseDown={onOverlayMouseDown}
-		>
+		<div className={cls.overlay} role="presentation" onMouseDown={onOverlayMouseDown}>
 			{submitSuccess ? (
 				<div
 					ref={panelRef}
@@ -428,44 +393,29 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 					</button>
 					<div className={cls.successBody}>
 						<div className={cls.successIllustration}>
-							<img
-								className={cls.successGlow}
-								src={SUCCESS_GLOW}
-								alt=""
-								width={400}
-								height={400}
-							/>
+							
 							<img
 								className={cls.successHero}
-								src={SUCCESS_ILLUSTRATION}
+								src={successImage}
 								alt=""
 								width={680}
 								height={427}
 							/>
 						</div>
-						<h2
-							id={`${uid}-success-title`}
-							className={cls.successTitle}
-						>
+						<h2 id={`${uid}-success-title`} className={cls.successTitle}>
 							передано в рассмотрение
 						</h2>
 						<div className={cls.successDesc}>
 							<p>
-								Документ успешно загружен и передан на предварительную
-								проверку.
+								Документ успешно загружен и передан на предварительную проверку.
 								{createdDocId != null ? (
 									<>
 										{' '}
-										<span className={cls.successDocId}>
-											(№ {createdDocId})
-										</span>
+										<span className={cls.successDocId}>(№ {createdDocId})</span>
 									</>
 								) : null}
 							</p>
-							<p>
-								После проверки он будет направлен экспертам для
-								рецензирования.
-							</p>
+							<p>После проверки он будет направлен экспертам для рецензирования.</p>
 						</div>
 					</div>
 					<button
@@ -497,171 +447,169 @@ export const CreateDocumentModal: FC<CreateDocumentModalProps> = ({
 					/>
 
 					<div className={cls.body}>
-					<div className={cls.header}>
-						<h2 id={`${uid}-modal-title`} className={cls.title}>
-							создать документ
-						</h2>
-						<button
-							type="button"
-							className={cls.closeBtn}
-							aria-label="Закрыть"
-							onClick={onClose}
-						>
-							<XIcon size={28} weight="regular" />
-						</button>
-					</div>
-
-					{!hasFile ? (
-						<div
-							className={cls.dropzone}
-							onDragOver={(e) => e.preventDefault()}
-							onDrop={(e) => {
-								e.preventDefault();
-								const f = e.dataTransfer.files?.[0];
-								if (f) {
-									applyFile(f);
-								}
-							}}
-						>
-							<div className={cls.dropzoneInner}>
-								<div className={cls.fileIcons} aria-hidden>
-									<div className={`${cls.fileCard} ${cls.fileCardPdf}`}>
-										<p className={`${cls.fileLabel} ${cls.fileLabelPdf}`}>
-											PDF
-										</p>
-										<div className={cls.fileBars}>
-											<div
-												className={`${cls.fileBarShort} ${cls.barPdf}`}
-											/>
-											<div
-												className={`${cls.fileBarFull} ${cls.barPdf}`}
-											/>
-										</div>
-									</div>
-									<div className={`${cls.fileCard} ${cls.fileCardDoc}`}>
-										<p className={`${cls.fileLabel} ${cls.fileLabelDoc}`}>
-											DOC
-										</p>
-										<div className={cls.fileBars}>
-											<div
-												className={`${cls.fileBarShort} ${cls.barDoc}`}
-											/>
-											<div
-												className={`${cls.fileBarFull} ${cls.barDoc}`}
-											/>
-										</div>
-									</div>
-								</div>
-								<div className={cls.dropTextBlock}>
-									<p className={cls.dropHeading}>
-										Перетащи файл или выбери на компьютере
-									</p>
-									<p className={cls.dropHint}>
-										Форматы: PDF, DOC, DOCX, TXT
-									</p>
-								</div>
-							</div>
+						<div className={cls.header}>
+							<h2 id={`${uid}-modal-title`} className={cls.title}>
+								создать документ
+							</h2>
 							<button
 								type="button"
-								className={cls.pickFileBtn}
-								onClick={openFilePicker}
+								className={cls.closeBtn}
+								aria-label="Закрыть"
+								onClick={onClose}
 							>
-								выбрать файл
+								<XIcon size={28} weight="regular" />
 							</button>
 						</div>
-					) : (
-						<div
-							className={cls.dropzoneFilled}
-							onDragOver={(e) => e.preventDefault()}
-							onDrop={(e) => {
-								e.preventDefault();
-								const f = e.dataTransfer.files?.[0];
-								if (f) {
-									applyFile(f);
-								}
-							}}
-						>
-							<div className={cls.previewThumbWrap}>
-								<button
-									type="button"
-									className={cls.removeFileBtn}
-									aria-label="Удалить файл"
-									onClick={clearFile}
-								>
-									<XIcon size={16} weight="regular" />
-								</button>
-								<div className={cls.thumbFrame}>{renderPreviewContent()}</div>
-							</div>
-							{showPreviewShortcut ? (
-								<button
-									type="button"
-									className={cls.previewShortcutBtn}
-									onClick={openPreview}
-								>
-									<span>предпросмотр</span>
-									<EyeIcon size={20} weight="regular" />
-								</button>
-							) : null}
-						</div>
-					)}
 
-					<div className={cls.fields}>
-						<input
-							type="text"
-							className={`${cls.field} ${useBodyTypoForFields ? cls.fieldBody : ''}`}
-							placeholder="название"
-							autoComplete="off"
-							value={title}
-							onChange={(e) => setTitle(e.target.value)}
-						/>
-						<textarea
-							className={`${cls.field} ${cls.textarea} ${hasFile ? cls.textareaCompact : ''} ${useBodyTypoForFields ? cls.fieldBody : ''}`}
-							placeholder="описание документа"
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-						/>
-						<div className={cls.coauthors}>
-							{resolvedCoauthors.map((person) => (
-								<div key={person.id} className={cls.coauthorChip}>
-									<img
-										className={cls.coavatar}
-										src={person.avatarUrl}
-										alt=""
-										width={44}
-										height={44}
-									/>
-									{person.email ? (
-										<div className={cls.chipTexts}>
-											<p className={cls.coauthorName}>{person.name}</p>
-											<p className={cls.chipEmail}>{person.email}</p>
-										</div>
-									) : (
-										<p className={cls.coauthorName}>{person.name}</p>
-									)}
-								</div>
-							))}
-							<button
-								type="button"
-								className={cls.addCoauthorBtn}
-								onClick={() => {
-									setSearchQuery('Васильев');
-									setIsSearchOpen(true);
+						{!hasFile ? (
+							<div
+								className={cls.dropzone}
+								onDragOver={(e) => e.preventDefault()}
+								onDrop={(e) => {
+									e.preventDefault();
+									const f = e.dataTransfer.files?.[0];
+									if (f) {
+										applyFile(f);
+									}
 								}}
 							>
-								<span className={cls.addCoauthorInner}>
-									<span className={cls.addCoauthorLabel}>
-										добавить соавтора
+								<div className={cls.dropzoneInner}>
+									<div className={cls.fileIcons} aria-hidden>
+										<div className={`${cls.fileCard} ${cls.fileCardPdf}`}>
+											<p className={`${cls.fileLabel} ${cls.fileLabelPdf}`}>
+												PDF
+											</p>
+											<div className={cls.fileBars}>
+												<div
+													className={`${cls.fileBarShort} ${cls.barPdf}`}
+												/>
+												<div
+													className={`${cls.fileBarFull} ${cls.barPdf}`}
+												/>
+											</div>
+										</div>
+										<div className={`${cls.fileCard} ${cls.fileCardDoc}`}>
+											<p className={`${cls.fileLabel} ${cls.fileLabelDoc}`}>
+												DOC
+											</p>
+											<div className={cls.fileBars}>
+												<div
+													className={`${cls.fileBarShort} ${cls.barDoc}`}
+												/>
+												<div
+													className={`${cls.fileBarFull} ${cls.barDoc}`}
+												/>
+											</div>
+										</div>
+									</div>
+									<div className={cls.dropTextBlock}>
+										<p className={cls.dropHeading}>
+											Перетащи файл или выбери на компьютере
+										</p>
+										<p className={cls.dropHint}>Форматы: PDF, DOC, DOCX, TXT</p>
+									</div>
+								</div>
+								<button
+									type="button"
+									className={cls.pickFileBtn}
+									onClick={openFilePicker}
+								>
+									выбрать файл
+								</button>
+							</div>
+						) : (
+							<div
+								className={cls.dropzoneFilled}
+								onDragOver={(e) => e.preventDefault()}
+								onDrop={(e) => {
+									e.preventDefault();
+									const f = e.dataTransfer.files?.[0];
+									if (f) {
+										applyFile(f);
+									}
+								}}
+							>
+								<div className={cls.previewThumbWrap}>
+									<button
+										type="button"
+										className={cls.removeFileBtn}
+										aria-label="Удалить файл"
+										onClick={clearFile}
+									>
+										<XIcon size={16} weight="regular" />
+									</button>
+									<div className={cls.thumbFrame}>{renderPreviewContent()}</div>
+								</div>
+								{showPreviewShortcut ? (
+									<button
+										type="button"
+										className={cls.previewShortcutBtn}
+										onClick={openPreview}
+									>
+										<span>предпросмотр</span>
+										<EyeIcon size={20} weight="regular" />
+									</button>
+								) : null}
+							</div>
+						)}
+
+						<div className={cls.fields}>
+							<input
+								type="text"
+								className={`${cls.field} ${useBodyTypoForFields ? cls.fieldBody : ''}`}
+								placeholder="название"
+								autoComplete="off"
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
+							/>
+							<textarea
+								className={`${cls.field} ${cls.textarea} ${hasFile ? cls.textareaCompact : ''} ${useBodyTypoForFields ? cls.fieldBody : ''}`}
+								placeholder="описание документа"
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+							/>
+							<div className={cls.coauthors}>
+								{resolvedCoauthors.map((person) => (
+									<div key={person.id} className={cls.coauthorChip}>
+										<img
+											className={cls.coavatar}
+											src={person.avatarUrl}
+											alt=""
+											width={44}
+											height={44}
+										/>
+										{person.email ? (
+											<div className={cls.chipTexts}>
+												<p className={cls.coauthorName}>{person.name}</p>
+												<p className={cls.chipEmail}>{person.email}</p>
+											</div>
+										) : (
+											<p className={cls.coauthorName}>{person.name}</p>
+										)}
+									</div>
+								))}
+								<button
+									type="button"
+									className={cls.addCoauthorBtn}
+									onClick={() => {
+										setSearchQuery('Васильев');
+										setIsSearchOpen(true);
+									}}
+								>
+									<span className={cls.addCoauthorInner}>
+										<span className={cls.addCoauthorLabel}>
+											добавить соавтора
+										</span>
+										<PlusIcon
+											className={cls.addCoauthorIcon}
+											size={20}
+											weight="regular"
+										/>
 									</span>
-									<PlusIcon
-										className={cls.addCoauthorIcon}
-										size={20}
-										weight="regular"
-									/>
-								</span>
-							</button>
+								</button>
+							</div>
 						</div>
 					</div>
-				</div>
 
 					{isSearchOpen ? (
 						<div

@@ -22,8 +22,4 @@ export const AVATAR_VICTOR_CHIP =
 	'https://www.figma.com/api/mcp/asset/55fa8c8d-84e4-4571-8442-faaa6fd355bc';
 
 /** Экран «передано в рассмотрение» (node 1593:17402) */
-export const SUCCESS_ILLUSTRATION =
-	'https://www.figma.com/api/mcp/asset/bee5bc51-5b51-4821-a7ea-8e3194f29a95';
 
-export const SUCCESS_GLOW =
-	'https://www.figma.com/api/mcp/asset/bbd82bf6-f2a7-42ca-b639-1c1cca405b75';

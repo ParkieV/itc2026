@@ -20,6 +20,51 @@
 	font-size: 15px;
 }
 
+.viewTabs {
+	display: flex;
+	align-items: flex-end;
+	gap: 40px;
+	margin-bottom: 20px;
+}
+
+.viewTab {
+	font-family: 'Roboto Mono', monospace;
+	font-size: 18px;
+	color: rgba(34, 43, 51, 0.45);
+	border-radius: 0;
+	background: transparent;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	transition: color 0.2s ease-in-out;
+	border: none;
+	position: relative;
+}
+
+.viewTab:hover {
+	color: rgba(34, 43, 51, 0.7);
+}
+
+.viewTabActive {
+	color: #0B44FF;
+}
+
+.viewTabActive::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -14px;
+	height: 4px;
+	background: #0b44ff;
+}
+
+.ganttBoard {
+	padding: 12px 0 6px;
+}
+
 .stage {
 	flex: 0 0 577px;
 	border-radius: 8px;
@@ -231,6 +276,36 @@
 	text-transform: lowercase;
 }
 
+.taskActionsRow {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.downloadButton {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	border-radius: 6px;
+	color: #222B33;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 400;
+	letter-spacing: -0.03em;
+	text-transform: lowercase;
+}
+
+.downloadButton:hover {
+	background: rgba(11, 68, 255, 0.08);
+}
+
+.downloadButton:disabled {
+	opacity: 0.65;
+	cursor: not-allowed;
+}
+
 .openButtonIcon {
 	width: 24px;
 	height: 24px;
@@ -253,10 +328,6 @@
 }
 
 .addDocBtn {
-	position: fixed;
-	bottom: 60px;
-	right: 50%;
-	transform: translateX(50%);
 	font-family: 'Roboto Mono', monospace;
 	font-size: 18px;
 	color: #ffffff;
@@ -268,6 +339,37 @@
 	align-items: center;
 	gap: 8px;
 	transition: border-radius 0.4s ease-in-out, background 0.4s ease-in-out;
+	&:hover {
+		background: #0b44ff;
+		border-radius: 50px;
+	}
+}
+
+.quickActions {
+	position: fixed;
+	bottom: 60px;
+	right: 50%;
+	z-index: 2;
+	transform: translateX(50%);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.filterBtn {
+	font-family: 'Roboto Mono', monospace;
+	font-size: 18px;
+	color: #ffffff;
+	border-radius: 4px;
+	background: #1b1c1e;
+	display: inline-flex;
+	padding: 20px 24px;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	transition: border-radius 0.4s ease-in-out, background 0.4s ease-in-out;
+
 	&:hover {
 		background: #0b44ff;
 		border-radius: 50px;

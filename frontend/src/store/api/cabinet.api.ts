@@ -9,6 +9,7 @@ import type {
 	V1CabinetDocumentsCommentPatchRequest,
 	V1CabinetMeGetResponse,
 	V1ChangeDocStagePostRequest,
+	V1StagesListQueryParams,
 	V1StagesListGetResponse200,
 } from '@shared/types/api'
 
@@ -26,8 +27,14 @@ export const cabinetApi = api.injectEndpoints({
 				}
 			},
 		}),
-		listCabinetStages: builder.query<V1StagesListGetResponse200, void>({
-			query: () => '/cabinet/stages',
+		listCabinetStages: builder.query<V1StagesListGetResponse200, V1StagesListQueryParams | undefined>({
+			query: (params) =>
+				params
+					? {
+							url: '/cabinet/stages',
+							params,
+						}
+					: '/cabinet/stages',
 			providesTags: ['Stages'],
 		}),
 		moveCabinetDocument: builder.mutation<void, V1ChangeDocStagePostRequest>({
@@ -52,6 +59,26 @@ export const cabinetApi = api.injectEndpoints({
 					const blob = await response.blob()
 					return URL.createObjectURL(blob)
 				},
+			}),
+		}),
+		downloadCabinetReviewsPdf: builder.mutation<string, number>({
+			// Кабинет: скачивание "сводки" (PDF) для текущего review.
+			query: (docId) => ({
+				method: 'POST',
+				url: '/cabinet/reviews/pdf',
+				params: { doc_id: docId },
+				responseHandler: async (response) => {
+					const blob = await response.blob()
+					return URL.createObjectURL(blob)
+				},
+			}),
+		}),
+		viewCabinetReviews: builder.mutation<void, {docId: number; stageId: number}>({
+			// Кабинет: отметить review как "просмотренный" при входе на страницу документа.
+			query: ({docId, stageId}: {docId: number; stageId: number}) => ({
+				method: 'POST',
+				url: '/cabinet/reviews/view',
+				params: { doc_id: docId, stage_id: stageId},
 			}),
 		}),
 		createCabinetDocumentComment: builder.mutation<
@@ -104,6 +131,8 @@ export const {
 	useGetCabinetDocumentQuery,
 	useLazyGetCabinetDocumentQuery,
 	useLazyGetCabinetDocumentPdfQuery,
+	useDownloadCabinetReviewsPdfMutation,
+	useViewCabinetReviewsMutation,
 	useCreateCabinetDocumentCommentMutation,
 	usePatchCabinetDocumentCommentMutation,
 	useSetCabinetReviewStatusMutation,

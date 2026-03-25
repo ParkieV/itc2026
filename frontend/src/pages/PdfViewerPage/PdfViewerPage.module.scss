@@ -201,9 +201,9 @@
 	height: 90px;
 	border: none;
 	cursor: pointer;
-	font-family: "Roboto Mono", monospace;
+	font-family: "InterDisplay";
 	font-size: 18px;
-	font-weight: 400;
+	font-weight: 500;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -216,7 +216,48 @@
 }
 
 .approveBtn {
+	background: #0b44ff;
+}
+
+.returnToReviewBtn {
+	flex: 1;
+	height: 90px;
+	border: none;
+	cursor: pointer;
+	font-family: "InterDisplay";
+	font-size: 18px;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	color: #ffffff;
+	background: #1b1c1e;
+}
+
+.decisionBtn {
+	flex: 1;
+	height: 90px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	font-family: "InterDisplay";
+	font-size: 18px;
+	font-weight: 500;
+	color: #ffffff;
 	background: #7595ff;
+	cursor: default;
+}
+
+.returnToReviewIcon {
+	font-size: 24px;
+	line-height: 1;
+}
+
+.decisionIcon {
+	font-size: 22px;
+	line-height: 1;
 }
 
 .declineBtn:disabled,
@@ -226,15 +267,13 @@
 }
 
 .declineIcon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
+	font-size: 24px;
+	line-height: 1;
 }
 
 .approveIcon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
+	font-size: 22px;
+	line-height: 1;
 }
 
 .panel {

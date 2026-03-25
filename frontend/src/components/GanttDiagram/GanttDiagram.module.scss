@@ -1,0 +1,264 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 0;
+}
+
+.ganttHint {
+	margin: 0;
+	padding: 24px 8px;
+	color: rgba(34, 43, 51, 0.65);
+	font-size: 15px;
+}
+
+.ganttHeader {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+}
+
+.ganttHeaderLeft {
+	flex: 0 0 420px;
+	min-width: 420px;
+	padding: 6px 0;
+}
+
+.ganttTitle {
+	margin: 0;
+	font-size: 24px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: #222b33;
+	text-transform: none;
+}
+
+.ganttRange {
+	margin-top: 6px;
+	color: rgba(34, 43, 51, 0.65);
+	font-size: 14px;
+	line-height: 18px;
+}
+
+.ganttLegend {
+	margin-top: 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 14px;
+}
+
+.legendItem {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: rgba(34, 43, 51, 0.75);
+	font-size: 14px;
+	white-space: nowrap;
+}
+
+.legendDot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #000;
+}
+
+.legendLabel {
+	display: inline-block;
+}
+
+.ganttHeaderTimeline {
+	position: relative;
+	height: 44px;
+	border-radius: 8px;
+	border: 1px solid rgba(34, 43, 51, 0.06);
+	background: #fff;
+	overflow: hidden;
+}
+
+.ganttHeaderGrid {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+.ganttTick {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 0;
+}
+
+.ganttTickLabel {
+	position: absolute;
+	top: 10px;
+	transform: translateX(-50%);
+	font-size: 12px;
+	color: rgba(34, 43, 51, 0.55);
+	white-space: nowrap;
+	background: rgba(255, 255, 255, 0.75);
+	padding: 2px 6px;
+	border-radius: 999px;
+	border: 1px solid rgba(34, 43, 51, 0.06);
+}
+
+.todayLine {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background: rgba(11, 68, 255, 0.35);
+	box-shadow: 0 0 0 1px rgba(11, 68, 255, 0.15);
+}
+
+.ganttScroll {
+	overflow: auto;
+	border-radius: 8px;
+	border: 1px solid rgba(34, 43, 51, 0.06);
+	background: #fff;
+}
+
+.ganttBody {
+	padding: 10px;
+}
+
+.ganttRow {
+	display: flex;
+	align-items: stretch;
+	gap: 16px;
+	padding: 10px;
+	border-radius: 10px;
+	transition: background 0.15s ease;
+}
+
+.ganttRow:hover {
+	background: rgba(27, 28, 30, 0.03);
+}
+
+.ganttLeft {
+	flex: 0 0 420px;
+	min-width: 420px;
+	padding: 8px 8px;
+}
+
+.ganttTaskTitle {
+	margin: 0;
+	font-size: 18px;
+	line-height: 22px;
+	font-weight: 600;
+	letter-spacing: -0.03em;
+	color: #222b33;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 400px;
+}
+
+.ganttMetaRow {
+	margin-top: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.ganttStageMeta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	color: rgba(34, 43, 51, 0.7);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 240px;
+}
+
+.stageDot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.ganttDuration {
+	font-size: 14px;
+	color: rgba(34, 43, 51, 0.6);
+	white-space: nowrap;
+}
+
+.ganttBadgesRow {
+	margin-top: 10px;
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.ganttSmall {
+	margin-top: 10px;
+	font-size: 13px;
+	line-height: 18px;
+	color: rgba(34, 43, 51, 0.65);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ganttSmallLabel {
+	color: rgba(34, 43, 51, 0.55);
+}
+
+.ganttSmallMuted {
+	margin-top: 6px;
+	font-size: 13px;
+	line-height: 18px;
+	color: rgba(34, 43, 51, 0.45);
+}
+
+.ganttLane {
+	position: relative;
+	height: 110px;
+	background: #fff;
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid rgba(34, 43, 51, 0.03);
+}
+
+.ganttLane::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background-image: linear-gradient(to right, rgba(34, 43, 51, 0.08) 1px, transparent 1px);
+	background-size: 16px 100%;
+	opacity: 0.7;
+}
+
+.ganttBar {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 28px;
+	border-radius: 8px;
+	border: 1px solid rgba(34, 43, 51, 0.1);
+	box-shadow: 0 10px 25px rgba(2, 6, 23, 0.08);
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	overflow: hidden;
+}
+
+.ganttBarInner {
+	position: absolute;
+	inset: 0;
+	opacity: 0.85;
+}
+
+.ganttBar::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0));
+	opacity: 0.8;
+}
+
