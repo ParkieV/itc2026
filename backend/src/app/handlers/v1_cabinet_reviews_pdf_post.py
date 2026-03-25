@@ -1,6 +1,6 @@
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import Response
 
 from handlers.dependencies.get_current_client_id import get_current_client_id
@@ -14,10 +14,11 @@ router = APIRouter()
 @inject
 async def cabinet_reviews_pdf(
     generate_reviews_pdf_service: FromDishka[GenerateReviewsPdfService],
+    doc_id: int = Query(..., description="Идентификатор документа"),
     _: str = Depends(get_current_client_id),
 ) -> Response:
     try:
-        pdf_content = generate_reviews_pdf_service.execute()
+        pdf_content = await generate_reviews_pdf_service.execute(doc_id)
     except RuntimeError as err:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

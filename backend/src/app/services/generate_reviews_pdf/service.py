@@ -11,15 +11,18 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+from entities.comment import Comment
+from services.get_comments_by_doc.service import GetCommentsByDocService
+
 
 @dataclass(frozen=True, slots=True)
 class MockReview:
     position: int
     structural_element: str
     organization: str
-    comment: str
-    proposed_revision: str
-    rationale: str
+    remark: str | None
+    proposal: str | None
+    justification: str | None
     developer_response: str
 
 
@@ -32,7 +35,10 @@ class GenerateReviewsPdfService:
         "boldItalic": Path("/System/Library/Fonts/Supplemental/Times New Roman Bold Italic.ttf"),
     }
 
-    def execute(self) -> bytes:
+    def __init__(self, get_comments_by_doc_service: GetCommentsByDocService) -> None:
+        self._get_comments_by_doc_service = get_comments_by_doc_service
+
+    async def execute(self, doc_id: int) -> bytes:
         self._register_times_new_roman()
         buffer = BytesIO()
         document = SimpleDocTemplate(
@@ -47,7 +53,8 @@ class GenerateReviewsPdfService:
         styles = self._build_styles()
         story = self._build_title_flowables(styles["title"])
         story.append(Spacer(1, 8 * mm))
-        story.append(self._build_table(styles["header"], styles["body"], styles["body_center"]))
+        reviews = self._build_mock_reviews(await self._get_comments_by_doc_service.execute(doc_id))
+        story.append(self._build_table(styles["header"], styles["body"], styles["body_center"], reviews))
 
         document.build(story)
         return buffer.getvalue()
@@ -68,6 +75,7 @@ class GenerateReviewsPdfService:
         header_style: ParagraphStyle,
         body_style: ParagraphStyle,
         body_center_style: ParagraphStyle,
+        reviews: list[MockReview],
     ) -> Table:
         rows: list[list[Paragraph]] = [
             [
@@ -81,16 +89,16 @@ class GenerateReviewsPdfService:
             ]
         ]
 
-        for review in self._build_mock_reviews():
+        for review in reviews:
             rows.append(
                 [
                     Paragraph(str(review.position), body_center_style),
                     Paragraph(review.structural_element, body_style),
                     Paragraph(review.organization, body_style),
-                    Paragraph(review.comment, body_style),
-                    Paragraph(review.proposed_revision, body_style),
-                    Paragraph(review.rationale, body_style),
-                    Paragraph(review.developer_response, body_style),
+                    Paragraph(review.remark or "", body_style),
+                    Paragraph(review.proposal or "", body_style),
+                    Paragraph(review.justification or "", body_style),
+                    Paragraph(review.developer_response or "", body_style),
                 ]
             )
 
@@ -189,31 +197,46 @@ class GenerateReviewsPdfService:
             boldItalic=f"{self._FONT_NAME}-BoldItalic",
         )
 
-    def _build_mock_reviews(self) -> list[MockReview]:
-        return [
-            MockReview(
-                position=index,
-                structural_element=f"Раздел {index}. Требования к подсистеме диспетчеризации перевозок опасных грузов",
-                organization=(
-                    f"ООО «Организация {index}» "
-                    f"(исх. № {100 + index} от {index:02d}.03.2026)"
-                ),
-                comment=(
-                    "Предлагается уточнить состав обязательных данных, которые должны "
-                    "передаваться в подсистему, а также порядок обновления этих сведений."
-                ),
-                proposed_revision=(
-                    "Установить минимальный обязательный набор данных о транспортном средстве, "
-                    "маршруте, грузе и статусе перевозки с обновлением не реже одного раза в 5 минут."
-                ),
-                rationale=(
-                    "Такая редакция исключает неоднозначность при внедрении стандарта в "
-                    "региональных системах и облегчает контроль полноты передаваемой информации."
-                ),
-                developer_response=(
-                    "Принято частично. В окончательной редакции будут уточнены состав обязательных "
-                    "полей и минимальная периодичность обновления сведений."
-                ),
+    @staticmethod
+    def _build_reply_map(comments: list[Comment]) -> dict[int, Comment]:
+        """
+        reply_to -> reply_comment
+        Берём первое совпадение по reply_to, чтобы не дублировать данные.
+        """
+        out: dict[int, Comment] = {}
+        # Сортируем по id, чтобы "первое совпадение" было детерминированным.
+        for c in sorted(comments, key=lambda x: x.comment_id):
+            if c.reply_to is None:
+                continue
+            out.setdefault(c.reply_to, c)
+        return out
+
+    def _build_mock_reviews(self, comments: list[Comment]) -> list[MockReview]:
+        comments_sorted = sorted(comments, key=lambda x: x.comment_id)
+        reply_map = self._build_reply_map(comments_sorted)
+        top_comments = [c for c in comments_sorted if c.reply_to is None]
+
+        reviews: list[MockReview] = []
+        for position, c in enumerate(top_comments, start=1):
+            reply = reply_map.get(c.comment_id)
+            developer_response = (reply.developer_response or "") if reply else ""
+
+            reviews.append(
+                MockReview(
+                    position=position,
+                    structural_element=(
+                        f"Раздел {position}. Требования к подсистеме диспетчеризации "
+                        "перевозок опасных грузов"
+                    ),
+                    organization=(
+                        f"ООО «Организация {position}» "
+                        f"(исх. № {100 + position} от {position:02d}.03.2026)"
+                    ),
+                    remark=c.remark,
+                    proposal=c.proposal,
+                    justification=c.justification,
+                    developer_response=developer_response,
+                )
             )
-            for index in range(1, 19)
-        ]
+
+        return reviews
