@@ -49,6 +49,7 @@ from usecases.get_stages_with_reviewer_and_docs.usecase import GetStagesWithRevi
 from services.notification import InAppUserNotifier, Notifier
 from services.user_in_app_notification.service import UserInAppNotificationService
 from usecases.create_in_app_user_notification.usecase import CreateInAppUserNotificationUseCase
+from services.filter_documents.service import FilterDocumentsService
 
 
 _ENV_PATH = os.environ.get("ENV_PATH")
@@ -387,18 +388,27 @@ class AsyncAppProvider(Provider):
         )
 
     @provide
+    async def filter_documents_service(
+        self,
+        document_repo: InMemoryDocumentRepository,
+    ) -> FilterDocumentsService:
+        return FilterDocumentsService(document_repo)
+
+    @provide
     async def get_stages_with_reviewer_and_docs_uc(
         self,
         stages_repo: AsyncInMemoryStagesRepository,
         reviews_repo: AsyncInMemoryReviewsRepository,
         user_repo: AsyncInMemoryUserRepository,
         document_repo: InMemoryDocumentRepository,
+        filter_documents_service: FilterDocumentsService,
     ) -> GetStagesWithReviewerAndDocsUseCase:
         return GetStagesWithReviewerAndDocsUseCase(
             stages_repo,
             document_repo,
             reviews_repo,
             user_repo,
+            filter_documents_service,
         )
 
 
