@@ -37,7 +37,7 @@ class ChangeDocumentStageUseCase:
 
         if document.stage_id == stage_id:
             raise InvalidTargetStage(
-                f"Target stage {stage_id} is invalid: it matches current document stage",
+                f"Этап №{stage_id} уже активен",
             )
 
         try:
@@ -48,8 +48,7 @@ class ChangeDocumentStageUseCase:
         expected_next_stage = current_stage.next_stage
         if expected_next_stage is None or stage_id != expected_next_stage:
             raise InvalidTargetStage(
-                f"Target stage {stage_id} is invalid: must be next_stage {expected_next_stage} "
-                f"for current stage {document.stage_id}",
+                f"Можно перенести задачу только на этап №{expected_next_stage}. Попытка переноса на №{stage_id}",
             )
 
         try:
@@ -63,13 +62,11 @@ class ChangeDocumentStageUseCase:
         )
         if any(r.status == ReviewStatus.DECLINED for r in reviews):
             raise DocumentRevisionRequired(
-                "Требуется внести изменения в документ: есть ревью со статусом DECLINED "
-                f"(doc_id={doc_id}, stage_id={document.stage_id})",
+                "Требуется внести изменения в документ: есть ревью со статусом 'Отклонено' ",
             )
         if any(r.status != ReviewStatus.ACCEPTED for r in reviews):
             raise ReviewsNotAllAccepted(
-                "All reviewers for the current stage must have review status ACCEPTED "
-                f"before moving the document (doc_id={doc_id}, stage_id={document.stage_id})",
+                "Не все проверяющие на данном этапе утвердить документ",
             )
 
         updated_document = Document(
