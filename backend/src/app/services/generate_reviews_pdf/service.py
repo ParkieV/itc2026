@@ -9,12 +9,14 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from entities.comment import Comment
 from entities.user import User
 from services.get_comments_by_doc.service import GetCommentsByDocService
+from services.get_pdf_document.service import GetPdfDocumentService
 from services.get_user.exceptions import UserNotFound
 from services.get_user.service import GetUserService
 
@@ -32,6 +34,12 @@ class MockReview:
 
 class GenerateReviewsPdfService:
     _FONT_NAME = "TimesNewRoman"
+    _PAGE_SIZE = landscape(A4)
+    _LEFT_MARGIN = 20 * mm
+    _RIGHT_MARGIN = 20 * mm
+    _TOP_MARGIN = 14 * mm
+    _BOTTOM_MARGIN = 11 * mm
+    _TITLE_MAX_WIDTH = _PAGE_SIZE[0] - _LEFT_MARGIN - _RIGHT_MARGIN
     _FONT_PATHS = {
         "normal": "Times New Roman.ttf",
         "bold": "Times New Roman Bold.ttf",
@@ -43,24 +51,27 @@ class GenerateReviewsPdfService:
         self,
         get_comments_by_doc_service: GetCommentsByDocService,
         get_user_service: GetUserService,
+        get_pdf_document_service: GetPdfDocumentService,
     ) -> None:
         self._get_comments_by_doc_service = get_comments_by_doc_service
         self._get_user_service = get_user_service
+        self._get_pdf_document_service = get_pdf_document_service
 
     async def execute(self, doc_id: int) -> bytes:
         self._register_times_new_roman()
         buffer = BytesIO()
         document = SimpleDocTemplate(
             buffer,
-            pagesize=landscape(A4),
-            leftMargin=20 * mm,
-            rightMargin=20 * mm,
-            topMargin=14 * mm,
-            bottomMargin=11 * mm,
+            pagesize=self._PAGE_SIZE,
+            leftMargin=self._LEFT_MARGIN,
+            rightMargin=self._RIGHT_MARGIN,
+            topMargin=self._TOP_MARGIN,
+            bottomMargin=self._BOTTOM_MARGIN,
         )
 
         styles = self._build_styles()
-        story = self._build_title_flowables(styles["title"])
+        pdf_document = await self._get_pdf_document_service.execute(doc_id)
+        story = self._build_title_flowables(styles["title"], pdf_document.title)
         story.append(Spacer(1, 8 * mm))
         comments = await self._get_comments_by_doc_service.execute(doc_id)
         users_by_id = await self._get_users_by_id_for_top_comments(comments)
@@ -70,16 +81,94 @@ class GenerateReviewsPdfService:
         document.build(story)
         return buffer.getvalue()
 
-    def _build_title_flowables(self, title_style: ParagraphStyle) -> list[Paragraph]:
+    def _build_title_flowables(
+        self,
+        title_style: ParagraphStyle,
+        document_title: str,
+    ) -> list[Paragraph]:
         title_lines = [
             "Приложение",
             "Сводная информация по предложениям, поступившим от организаций, "
             "по рассмотрению окончательной редакции проекта ПНСТ",
-            "«Интеллектуальные транспортные системы. Подсистема диспетчеризации "
-            "перевозок опасных грузов. Общие требования»",
+            *self._wrap_title_lines(self._format_document_title(document_title), title_style),
             "(Шифр: 1.11.057-1.121.25)",
         ]
         return [Paragraph(line, title_style) for line in title_lines]
+
+    @classmethod
+    def _wrap_title_lines(
+        cls,
+        title_text: str,
+        title_style: ParagraphStyle,
+    ) -> list[str]:
+        words = title_text.split()
+        if not words:
+            return [title_text]
+
+        lines: list[str] = []
+        current_line = words[0]
+
+        for word in words[1:]:
+            candidate = f"{current_line} {word}"
+            if cls._fits_title_width(candidate, title_style):
+                current_line = candidate
+                continue
+
+            lines.extend(cls._split_long_title_part(current_line, title_style))
+            current_line = word
+
+        lines.extend(cls._split_long_title_part(current_line, title_style))
+        return lines
+
+    @classmethod
+    def _split_long_title_part(
+        cls,
+        title_part: str,
+        title_style: ParagraphStyle,
+    ) -> list[str]:
+        if cls._fits_title_width(title_part, title_style):
+            return [title_part]
+
+        parts: list[str] = []
+        current_part = ""
+        for char in title_part:
+            candidate = f"{current_part}{char}"
+            if current_part and not cls._fits_title_width(candidate, title_style):
+                parts.append(current_part)
+                current_part = char
+                continue
+            current_part = candidate
+
+        if current_part:
+            parts.append(current_part)
+
+        return parts
+
+    @classmethod
+    def _fits_title_width(
+        cls,
+        text: str,
+        title_style: ParagraphStyle,
+    ) -> bool:
+        return stringWidth(text, title_style.fontName, title_style.fontSize) <= cls._TITLE_MAX_WIDTH
+
+    @staticmethod
+    def _format_document_title(document_title: str) -> str:
+        normalized_title = " ".join(document_title.split())
+        if not normalized_title:
+            return "«»"
+
+        quote_pairs = {
+            ("«", "»"),
+            ('"', '"'),
+            ("'", "'"),
+            ("“", "”"),
+            ("„", "“"),
+        }
+        if (normalized_title[0], normalized_title[-1]) in quote_pairs:
+            return normalized_title
+
+        return f"«{normalized_title}»"
 
     def _build_table(
         self,
