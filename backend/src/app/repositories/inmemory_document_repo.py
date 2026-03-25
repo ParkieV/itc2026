@@ -52,7 +52,8 @@ class InMemoryDocumentRepository:
         modified_at = document.modified_at or created_at
 
         # TODO: ПРОВЕРИТЬ
-        self._docs[self._count] = {
+        # Keep keys consistent with get_document() which looks up via `str(document_id)`.
+        self._docs[str(self._count)] = {
           **asdict(document),
           "created_at": created_at,
           "modified_at": modified_at,
