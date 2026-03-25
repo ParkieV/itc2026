@@ -41,6 +41,7 @@ class HTTPServerSettings(BaseSettings):
     api_version: str
     origins: list[str] | None = None
 
+
     @cached_property
     def origins(self):
         match self._run_mode:
