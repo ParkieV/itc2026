@@ -15,6 +15,7 @@ from repositories.inmemory_user_repo import AsyncInMemoryUserRepository
 from services.add_document.service import AddDocumentService
 from services.add_origin_document_file.service import AddOriginDocumentFileService
 from services.authenticate_user.service import AuthenticateUserService
+from services.generate_reviews_pdf import GenerateReviewsPdfService
 from services.save_pdf_document_file.service import SavePdfDocumentFileService
 from services.get_user.service import GetUserService
 from services.issue_access_token import IssueAccessTokenService
@@ -160,6 +161,10 @@ class AsyncAppProvider(Provider):
         document_files_repo: InMemoryDocumentFilesRepository,
     ) -> SavePdfDocumentFileService:
         return SavePdfDocumentFileService(document_files_repo)
+
+    @provide
+    async def generate_reviews_pdf_service(self) -> GenerateReviewsPdfService:
+        return GenerateReviewsPdfService()
 
     @provide
     async def add_document_service(
