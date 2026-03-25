@@ -11,7 +11,7 @@ import { UserProfileModal } from '@components/UserProfileModal/UserProfileModal'
 import { NotificationsPopover } from '@components/NotificationsPopover/NotificationsPopover'
 const NAV_ITEMS = [
 	// { id: 'home', label: 'главная', count: null },
-	{ id: 'kanban', label: 'все документы', count: 7 },
+	{ id: 'home', label: 'все документы', count: 7 },
 ];
 
 export const Header: FC = () => {
