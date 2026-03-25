@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from handlers.dependencies.get_current_client_id import get_current_client_id
 from services.comment_exceptions import CommentNotFound
 from services.get_pdf_document.exceptions import DocumentNotFound
+from services.get_user.exceptions import UserNotFound
+from services.get_user.service import GetUserService
 from services.patch_comment.service import PatchCommentService
 from .dtos.helper import openapi_responses
 from .dtos.v1_cabinet_documents_comment_patch import (
@@ -14,6 +16,7 @@ from .dtos.v1_cabinet_documents_comment_patch import (
     V1CabinetDocumentsCommentPatchRequest,
 )
 from .dtos.v1_cabinet_documents_comment_patch import V1CabinetDocumentsCommentPatchResponse
+from .dtos.comment_author_preview import CommentAuthorPreview
 
 router = APIRouter()
 
@@ -34,6 +37,7 @@ async def patch_document_comment(
     comment_id: int,
     request: V1CabinetDocumentsCommentPatchRequest,
     patch_comment_service: FromDishka[PatchCommentService],
+    get_user_service: FromDishka[GetUserService],
     _: str = Depends(get_current_client_id),
 ) -> V1CabinetDocumentsCommentPatchResponse:
     try:
@@ -47,18 +51,24 @@ async def patch_document_comment(
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
     except CommentNotFound as err_not_found:
         raise HTTPException(status_code=404, detail=str(err_not_found)) from err_not_found
-    return _comment_to_response(updated)
+    return await _comment_to_response(updated, get_user_service)
 
 
-def _comment_to_response(c) -> V1CabinetDocumentsCommentPatchResponse:
+async def _comment_to_response(c, get_user_service: GetUserService) -> V1CabinetDocumentsCommentPatchResponse:
+    try:
+        u = await get_user_service.execute(c.user_id)
+        fio = u.fio
+    except UserNotFound:
+        fio = ""
     return V1CabinetDocumentsCommentPatchResponse(
         comment_id=c.comment_id,
         doc_id=c.doc_id,
         stage_id=c.stage_id,
-        user_id=c.user_id,
+        author=CommentAuthorPreview(user_id=c.user_id, fio=fio),
         reply_to=c.reply_to,
-        subject=c.subject,
-        content=c.content,
+        remark=c.remark,
+        proposal=c.proposal,
+        justification=c.justification,
         xfdf=c.xfdf,
         status=c.status,
         is_viewed=c.is_viewed,

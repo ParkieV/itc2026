@@ -2,15 +2,18 @@ from pydantic import BaseModel, Field
 
 from entities.comment_status import CommentStatus
 
+from .comment_author_preview import CommentAuthorPreview
+
 
 class V1CabinetDocumentsCommentPatchResponse(BaseModel):
     comment_id: int
     doc_id: int
     stage_id: int
-    user_id: int
+    author: CommentAuthorPreview
     reply_to: int | None = None
-    subject: str
-    content: str
+    remark: str
+    proposal: str | None = None
+    justification: str | None = None
     xfdf: str
     status: CommentStatus | None = None
     is_viewed: bool = False

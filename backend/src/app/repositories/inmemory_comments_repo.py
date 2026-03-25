@@ -17,8 +17,9 @@ class AsyncInMemoryCommentsRepository:
                     "stage_id": 1,
                     "user_id": 1,
                     "reply_to": pd.NA,
-                    "subject": "Initial review",
-                    "content": "Please fix formatting and naming.",
+                    "remark": "Initial review",
+                    "proposal": "Please fix formatting and naming.",
+                    "justification": pd.NA,
                     "xfdf": "",
                     "status": pd.NA,
                     "is_viewed": False,
@@ -30,8 +31,9 @@ class AsyncInMemoryCommentsRepository:
                     "stage_id": 1,
                     "user_id": 2,
                     "reply_to": 1,
-                    "subject": "LGTM",
-                    "content": "No additional comments.",
+                    "remark": "LGTM",
+                    "proposal": "No additional comments.",
+                    "justification": pd.NA,
                     "xfdf": "",
                     "status": pd.NA,
                     "is_viewed": False,
@@ -43,8 +45,9 @@ class AsyncInMemoryCommentsRepository:
                     "stage_id": 2,
                     "user_id": 1,
                     "reply_to": pd.NA,
-                    "subject": "Needs tests",
-                    "content": "Please add integration tests.",
+                    "remark": "Needs tests",
+                    "proposal": "Please add integration tests.",
+                    "justification": pd.NA,
                     "xfdf": "",
                     "status": pd.NA,
                     "is_viewed": False,
@@ -73,14 +76,24 @@ class AsyncInMemoryCommentsRepository:
             return None
         return CommentStatus(s)
 
+    @staticmethod
+    def _nullable_str_value(v) -> str | None:
+        if v is None or pd.isna(v):
+            return None
+        s = str(v)
+        if not s.strip():
+            return None
+        return s
+
     def _series_to_comment(self, row: pd.Series) -> Comment:
         return Comment(
             comment_id=int(row["comment_id"]),
             doc_id=int(row["doc_id"]),
             stage_id=int(row["stage_id"]),
             user_id=int(row["user_id"]),
-            subject=str(row["subject"]),
-            content=str(row["content"]),
+            remark=str(row["remark"]),
+            proposal=self._nullable_str_value(row["proposal"]),
+            justification=self._nullable_str_value(row["justification"]),
             xfdf=str(row["xfdf"]),
             created_at=str(row["created_at"]),
             reply_to=self._reply_to_value(row["reply_to"]),
@@ -98,8 +111,9 @@ class AsyncInMemoryCommentsRepository:
             "stage_id": stored.stage_id,
             "user_id": stored.user_id,
             "reply_to": pd.NA if stored.reply_to is None else stored.reply_to,
-            "subject": stored.subject,
-            "content": stored.content,
+            "remark": stored.remark,
+            "proposal": pd.NA if stored.proposal is None else stored.proposal,
+            "justification": pd.NA if stored.justification is None else stored.justification,
             "xfdf": stored.xfdf,
             "status": pd.NA if stored.status is None else stored.status.value,
             "is_viewed": stored.is_viewed,
