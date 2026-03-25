@@ -32,11 +32,12 @@ class MockReview:
 
 class GenerateReviewsPdfService:
     _FONT_NAME = "TimesNewRoman"
+    _FONTS_DIR = Path(__file__).resolve().parents[3] / "static" / "fonts"
     _FONT_PATHS = {
-        "normal": Path("/System/Library/Fonts/Supplemental/Times New Roman.ttf"),
-        "bold": Path("/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf"),
-        "italic": Path("/System/Library/Fonts/Supplemental/Times New Roman Italic.ttf"),
-        "boldItalic": Path("/System/Library/Fonts/Supplemental/Times New Roman Bold Italic.ttf"),
+        "normal": _FONTS_DIR / "Times New Roman.ttf",
+        "bold": _FONTS_DIR / "Times New Roman Bold.ttf",
+        "italic": _FONTS_DIR / "Times New Roman Italic.ttf",
+        "boldItalic": _FONTS_DIR / "Times New Roman Bold Italic.ttf",
     }
 
     def __init__(
