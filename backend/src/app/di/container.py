@@ -166,8 +166,9 @@ class AsyncAppProvider(Provider):
     async def generate_reviews_pdf_service(
         self,
         get_comments_by_doc_service: GetCommentsByDocService,
+        get_user_service: GetUserService,
     ) -> GenerateReviewsPdfService:
-        return GenerateReviewsPdfService(get_comments_by_doc_service)
+        return GenerateReviewsPdfService(get_comments_by_doc_service, get_user_service)
 
     @provide
     async def add_document_service(
