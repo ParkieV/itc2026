@@ -39,7 +39,7 @@ class InMemoryDocumentRepository:
                 "modified_at": now_iso,
             },
         }
-        self._count = 2
+        self._count = 4
 
     def _add_count(self) -> None:
         self._count += 1

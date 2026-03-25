@@ -14,9 +14,17 @@ class InMemoryDocumentFilesRepository:
             1: {
                 "origin_file_path": "src/static/origins/test.docx",
                 "pdf_file_path": "src/static/pdfs/test.pdf",
-            }
+            },
+            2: {
+                "origin_file_path": "src/static/origins/test2.docx",
+                "pdf_file_path": "src/static/pdfs/test2.pdf",
+            },
+            3: {
+                "origin_file_path": "src/static/origins/test3.docx",
+                "pdf_file_path": "src/static/pdfs/test3.pdf",
+            },
         }
-        self._count = 1
+        self._count = 4
 
     def get_next_file_id(self) -> int:
         return self._count
