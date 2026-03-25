@@ -6,7 +6,9 @@ from handlers.dependencies.get_current_client_id import get_current_client_id
 from services.get_pdf_document.exceptions import DocumentNotFound
 from usecases.get_document_detail.usecase import GetDocumentDetailUseCase
 from usecases.get_document_user_status.usecase import GetDocumentUserStatusUseCase
+from .dtos.comment_author_preview import CommentAuthorPreview
 from .dtos.helper import openapi_responses
+from .dtos.v1_cabinet_document_comments_get import V1CabinetDocumentCommentResponse
 from .dtos.v1_cabinet_document_get import (
     V1_CABINET_DOCUMENT_GET_RESPONSE200,
     V1_CABINET_DOCUMENT_GET_RESPONSE401,
@@ -15,7 +17,6 @@ from .dtos.v1_cabinet_document_get import (
     V1CabinetDocumentGetReviewResponse,
     V1CabinetDocumentGetResponse,
 )
-from .dtos.v1_cabinet_document_get import V1CabinetDocumentGetResponse
 
 router = APIRouter()
 
@@ -67,11 +68,11 @@ async def cabinet_document_get(
             for i in detail.reviews
         ],
         comments=[
-            V1CabinetDocumentGetResponse(
+            V1CabinetDocumentCommentResponse(
                 comment_id=c.comment_id,
                 doc_id=c.doc_id,
                 stage_id=c.stage_id,
-                user_id=c.user_id,
+                author=CommentAuthorPreview(user_id=c.user_id, fio=""),
                 reply_to=c.reply_to,
                 subject=c.subject,
                 content=c.content,
