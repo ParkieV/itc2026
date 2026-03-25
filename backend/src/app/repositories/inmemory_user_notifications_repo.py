@@ -12,7 +12,7 @@ class InMemoryUserNotificationsRepository:
 
     def __init__(self) -> None:
         self._items: dict[int, dict[str, Any]] = {}
-        self._next_id = 1
+        self._next_id = len(self._items) + 1
 
     async def add(
         self,
