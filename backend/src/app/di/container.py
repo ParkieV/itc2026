@@ -18,6 +18,7 @@ from services.authenticate_user.service import AuthenticateUserService
 from services.generate_reviews_pdf import GenerateReviewsPdfService
 from services.save_pdf_document_file.service import SavePdfDocumentFileService
 from services.get_user.service import GetUserService
+from services.get_users.service import GetUsersService
 from services.issue_access_token import IssueAccessTokenService
 from usecases.authorize_user.usecase import AuthorizeUserUseCase
 from usecases.create_document_file.usecase import CreateDocumentFileUseCase
@@ -132,6 +133,13 @@ class AsyncAppProvider(Provider):
         user_repo: AsyncInMemoryUserRepository,
     ) -> GetUserService:
         return GetUserService(user_repo)
+
+    @provide
+    async def get_users_service(
+        self,
+        user_repo: AsyncInMemoryUserRepository,
+    ) -> GetUsersService:
+        return GetUsersService(user_repo)
 
     @provide
     async def get_pdf_document_service(

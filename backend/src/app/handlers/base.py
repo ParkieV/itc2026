@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from .v1_auth_authenticate_post import router as v1_auth_authenticate_post_router
 from .v1_cabinet_document_move_post import router as v1_cabinet_document_move_post_router
 from .v1_cabinet_me_get import router as v1_cabinet_me_get_router
+from .v1_cabinet_users_get import router as v1_cabinet_users_get_router
 from .v1_cabinet_documents_comment_patch import router as v1_cabinet_documents_comment_patch_router
 from .v1_cabinet_document_comments_get import router as v1_cabinet_document_comments_get_router
 from .v1_cabinet_document_comments_all_get import router as v1_cabinet_document_comments_all_get_router
@@ -22,6 +23,7 @@ router = APIRouter()
 router.include_router(v1_auth_authenticate_post_router)
 router.include_router(v1_cabinet_document_move_post_router)
 router.include_router(v1_cabinet_me_get_router)
+router.include_router(v1_cabinet_users_get_router)
 router.include_router(v1_cabinet_documents_comment_patch_router)
 router.include_router(v1_cabinet_document_comments_get_router)
 router.include_router(v1_cabinet_document_comments_all_get_router)
